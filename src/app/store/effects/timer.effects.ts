@@ -1,11 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { map, mergeMap, takeUntil } from 'rxjs/operators';
 import * as TimerActions from '../actions/timer.actions';
-import { map } from 'rxjs/operators';
+import { TimerService } from '../../shared/services/timer.service';
 
 @Injectable()
 export class TimerEffects {
-  constructor(private actions$: Actions) {}
+  startTimer$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(TimerActions.startTimer),
+      mergeMap(action =>
+        this.timerService.startTimer(action.duration).pipe(
+          map(remainingTime => TimerActions.tickTimer({ remainingTime })),
+          takeUntil(this.actions$.pipe(ofType(TimerActions.stopTimer, TimerActions.resetTimer)))
+        )
+      )
+    )
+  );
 
-  // Add your timer effects here
+  constructor(
+    private actions$: Actions,
+    private timerService: TimerService
+  ) {}
 }
