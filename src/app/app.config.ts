@@ -6,7 +6,6 @@ import { provideStore } from '@ngrx/store';
 import { timerReducer } from './store/reducers/timer.reducer';
 import { provideEffects } from '@ngrx/effects';
 import { TimerEffects } from './store/effects/timer.effects';
-import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers:
@@ -15,7 +14,6 @@ export const appConfig: ApplicationConfig = {
       provideRouter(routes),
       provideAnimationsAsync(),
       provideStore({ timer: timerReducer }),
-      provideHttpClient(),
       provideEffects([TimerEffects])
 ]
 };
