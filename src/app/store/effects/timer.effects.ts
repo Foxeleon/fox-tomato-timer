@@ -19,7 +19,7 @@ export class TimerEffects {
   );
 
   constructor(
-    private actions$: Actions,
+    private readonly actions$: Actions,
     private timerService: TimerService
   ) {}
 }

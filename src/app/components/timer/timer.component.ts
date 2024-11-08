@@ -7,6 +7,7 @@ import { TimerState } from '../../store/reducers/timer.reducer';
 @Component({
   selector: 'app-timer',
   templateUrl: './timer.component.html',
+  standalone: true,
   styleUrls: ['./timer.component.scss']
 })
 export class TimerComponent implements OnInit {
