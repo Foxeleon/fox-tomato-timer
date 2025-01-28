@@ -1,10 +1,18 @@
-.timer-display {
-  font-size: 48px;
-  margin: 20px 0;
+.timer {
+  text-align: center;
 }
 
-.timer-controls {
-  button {
-    margin-right: 10px;
-  }
+h2 {
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.duration-input {
+  width: 150px;
 }

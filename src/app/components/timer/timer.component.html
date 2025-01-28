@@ -1,11 +1,14 @@
-<div *ngIf="timerState$ | async as timerState">
-  <h2>Tomato Timer</h2>
-  <div class="timer-display">
-    {{ timerState.remainingTime | date:'mm:ss' }}
-  </div>
-  <div class="timer-controls">
+<div class="timer" *ngIf="timerState$ | async as timerState">
+  <h2 class="mat-display-4">{{ formatTime(timerState.remainingTime) }}</h2>
+
+  <div class="controls">
     <button mat-raised-button color="primary" (click)="startTimer()" [disabled]="timerState.isRunning">Start</button>
-    <button mat-raised-button color="warn" (click)="stopTimer()" [disabled]="!timerState.isRunning">Stop</button>
-    <button mat-raised-button (click)="resetTimer()">Reset</button>
+    <button mat-raised-button color="accent" (click)="pauseTimer()" [disabled]="!timerState.isRunning">Pause</button>
+    <button mat-raised-button color="warn" (click)="resetTimer()">Reset</button>
   </div>
+
+  <mat-form-field appearance="outline" class="duration-input">
+    <mat-label>Duration (minutes)</mat-label>
+    <input matInput type="number" [(ngModel)]="duration" (change)="changeDuration()" min="1" max="60">
+  </mat-form-field>
 </div>
