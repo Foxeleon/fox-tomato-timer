@@ -8,12 +8,14 @@ import { provideEffects } from '@ngrx/effects';
 import { TimerEffects } from './store/effects/timer.effects';
 import { provideHttpClient } from '@angular/common/http';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),
+    provideAnimations(),
     provideStore({ timer: timerReducer }),
     provideEffects([TimerEffects]),
     provideHttpClient(),
