@@ -39,7 +39,7 @@ export class TimerEffects {
     this.actions$.pipe(
       ofType(TimerActions.resetTimer),
       switchMap(action => {
-        this.timerService.resetTimer(action.duration);
+        this.timerService.resetTimer();
         return [TimerActions.tickTimer({ remainingTime: action.duration })];
       })
     )
