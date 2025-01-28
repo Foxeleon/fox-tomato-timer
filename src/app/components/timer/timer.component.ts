@@ -20,7 +20,7 @@ export class TimerComponent implements OnInit {
   ngOnInit(): void {}
 
   startTimer(): void {
-    this.store.dispatch(TimerActions.startTimer({ duration: 1500 })); // 25 minutes
+    this.store.dispatch(TimerActions.startTimer());
   }
 
   stopTimer(): void {
@@ -28,6 +28,6 @@ export class TimerComponent implements OnInit {
   }
 
   resetTimer(): void {
-    this.store.dispatch(TimerActions.resetTimer());
+    this.store.dispatch(TimerActions.resetTimer({ duration: 1500 }));
   }
 }
