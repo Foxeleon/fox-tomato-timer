@@ -1,13 +1,20 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { TimerComponent } from './components/timer/timer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [CommonModule, RouterOutlet, TimerComponent],
+  template: `
+    <div class="container mat-elevation-z2">
+      <h1 class="mat-h1">{{ title }}</h1>
+      <app-timer></app-timer>
+    </div>
+  `,
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'fox-tomato-timer';
+  title = 'Fox Tomato Timer';
 }

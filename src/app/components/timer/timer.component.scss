@@ -1,10 +1,43 @@
+.timer {
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.duration-input {
+  width: 150px;
+}
+
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
 .timer-display {
   font-size: 48px;
-  margin: 20px 0;
+  margin-bottom: 20px;
 }
 
 .timer-controls {
-  button {
-    margin-right: 10px;
+  display: flex;
+  gap: 20px;
+}
+
+button {
+  transition: transform 0.3s ease-in-out;
+
+  &:active {
+    transform: scale(0.95);
   }
 }
