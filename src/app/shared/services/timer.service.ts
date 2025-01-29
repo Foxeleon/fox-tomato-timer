@@ -4,6 +4,7 @@ import { map, takeWhile, takeUntil, tap } from 'rxjs/operators';
 import * as TimerActions from '../../store/actions/timer.actions';
 import { Store } from '@ngrx/store';
 import { TimerState } from '../../store/reducers/timer.reducer';
+import { selectIsRunning } from '../../store/selectors/timer.selectors';
 
 @Injectable({
   providedIn: 'root'
@@ -38,10 +39,14 @@ export class TimerService {
     return this.timerObservable;
   }
 
-  stopTimer() {
+  pauseTimer() {
     this.pauseSubject.next();
     this.pauseSubject.complete();
-    this.timerSubject.next(0);
+    this.timerObservable = null;
+  }
+
+  stopTimer() {
+    this.timerSubject.next(this.currentDuration);
     this.timerObservable = null;
   }
 
@@ -74,11 +79,5 @@ export class TimerService {
 
   getCurrentDuration(): number {
     return this.currentDuration;
-  }
-
-  pauseTimer() {
-    this.pauseSubject.next();
-    this.pauseSubject.complete();
-    this.timerObservable = null;
   }
 }

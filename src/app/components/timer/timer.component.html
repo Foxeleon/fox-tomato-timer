@@ -2,9 +2,17 @@
   <h2 class="mat-display-4">{{ formatTime(timerState.remainingTime) }}</h2>
 
   <div class="controls">
-    <button mat-raised-button color="primary" (click)="startTimer()" [disabled]="timerState.isRunning">Start</button>
-    <button mat-raised-button color="accent" (click)="pauseTimer()" [disabled]="!timerState.isRunning">Pause</button>
-    <button mat-raised-button color="warn" (click)="resetTimer()">Reset</button>
+    <button mat-fab color="primary" (click)="toggleTimer()" [@rotateAnimation]="timerState.isRunning ? 'pause' : 'play'">
+      <mat-icon>{{ timerState.isRunning ? 'pause' : 'play_arrow' }}</mat-icon>
+    </button>
+
+    <button mat-fab color="warn" (click)="stopTimer()">
+      <mat-icon>stop</mat-icon>
+    </button>
+
+    <button mat-fab color="warn" (click)="resetTimer()">
+      <mat-icon>replay</mat-icon>
+    </button>
   </div>
 
   <mat-form-field appearance="outline" class="duration-input">
