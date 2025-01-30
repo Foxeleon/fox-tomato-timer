@@ -10,8 +10,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatIconModule } from '@angular/material/icon';
-import { TimerService } from '../../shared/services/timer.service';
-import { selectIsRunning } from '../../store/selectors/timer.selectors';
 
 @Component({
   selector: 'app-timer',

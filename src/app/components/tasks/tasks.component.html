@@ -1,1 +1,19 @@
-<p>tasks works!</p>
+<div class="tasks-container">
+  <h2>Tasks</h2>
+  <div class="task-input">
+    <mat-form-field>
+      <input matInput [(ngModel)]="newTaskTitle" placeholder="New task" (keyup.enter)="addTask()">
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="addTask()">Add Task</button>
+  </div>
+  <mat-list>
+    <mat-list-item *ngFor="let task of tasks">
+      <mat-checkbox (change)="toggleTask(task)" [checked]="task.completed">
+        {{ task.title }}
+      </mat-checkbox>
+      <button mat-icon-button color="warn" (click)="deleteTask(task.id)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-list-item>
+  </mat-list>
+</div>
