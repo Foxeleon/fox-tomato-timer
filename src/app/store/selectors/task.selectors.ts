@@ -17,3 +17,13 @@ export const selectTasksError = createSelector(
   selectTaskState,
   (state: TaskState) => state.error
 );
+
+export const selectActiveTask = createSelector(
+  selectTaskState,
+  (state: TaskState) => state.activeTask
+);
+
+export const selectHasActiveTask = createSelector(
+  selectActiveTask,
+  (activeTask) => !!activeTask
+);

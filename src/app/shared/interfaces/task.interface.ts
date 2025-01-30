@@ -2,8 +2,13 @@ export interface Task {
   id: string;
   title: string;
   description?: string;
-  completed: boolean;
+  state: 'pending' | 'active' | 'paused' | 'completed';
   categoryId?: string;
-  duration?: number;
-  // Добавьте другие необходимые поля
+  duration: number;
+  elapsedTime: number;
+  order: number;
+}
+
+export interface ActiveTask extends Task {
+  startTime: number;
 }

@@ -34,7 +34,7 @@ export class TasksComponent implements OnInit {
 
   ngOnInit() {
     // Load tasks from localStorage on component initialization
-    const savedTasks = localStorage.getItem('tasks');
+    const savedTasks = localStorage.getItem('tasks_f-tomato-timer');
     if (savedTasks) {
       this.tasks = JSON.parse(savedTasks);
     }
@@ -64,6 +64,6 @@ export class TasksComponent implements OnInit {
   }
 
   private saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(this.tasks));
+    localStorage.setItem('tasks_f-tomato-timer', JSON.stringify(this.tasks));
   }
 }
