@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, interval, BehaviorSubject, Subject, take } from 'rxjs';
+import { Observable, interval, BehaviorSubject, Subject, take, startWith } from 'rxjs';
 import { map, takeWhile, takeUntil, tap } from 'rxjs/operators';
 import * as TimerActions from '../../store/actions/timer.actions';
 import { Store } from '@ngrx/store';
@@ -22,7 +22,6 @@ export class TimerService {
 
   startTimer(duration?: number): Observable<number> {
     if (duration !== undefined && this.timerSubject.value === 0) {
-      // Only set duration if it's provided and the timer is not already running
       this.currentDuration = duration;
       this.timerSubject.next(duration);
     }
@@ -30,11 +29,17 @@ export class TimerService {
     if (this.timerObservable === null) {
       this.pauseSubject = new Subject<void>();
       const startValue = this.timerSubject.value;
+
+      // Emit the initial value immediately
+      this.timerSubject.next(startValue);
+
       this.timerObservable = interval(1000).pipe(
-        map(tick => startValue - tick),
+        map(tick => startValue - tick - 1), // Subtract 1 to account for the immediate emission
         takeWhile(remainingTime => remainingTime >= 0),
         takeUntil(this.pauseSubject),
-        tap(remainingTime => this.timerSubject.next(remainingTime))
+        tap(remainingTime => this.timerSubject.next(remainingTime)),
+        // Start with the initial value
+        startWith(startValue)
       );
     }
 
