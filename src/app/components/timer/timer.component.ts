@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import * as TimerActions from '../../store/actions/timer.actions';
 import { TimerState } from '../../store/reducers/timer.reducer';
 import { CommonModule } from '@angular/common';
@@ -10,6 +10,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatIconModule } from '@angular/material/icon';
+import { map } from 'rxjs/operators';
+import { selectIsActiveTaskPaused, selectIsTaskInputActive } from '../../store/selectors/task.selectors';
+import { selectDuration } from '../../store/selectors/timer.selectors';
+import { TaskService } from '../../shared/services/task.service';
 
 @Component({
   selector: 'app-timer',
@@ -36,14 +40,27 @@ export class TimerComponent implements OnInit {
   timerState$: Observable<TimerState>;
   duration: number = 25; // Default 25 minutes
   isRunning = false;
+  isPlayButtonEnabled$: Observable<boolean>;
 
-  constructor(private store: Store<{ timer: TimerState }>) {
+  constructor(private store: Store<{ timer: TimerState }>, private taskService: TaskService) {
     this.timerState$ = store.select(state => state.timer);
+    const isTaskInputActive$ = this.store.select(selectIsTaskInputActive);
+    const isActiveTaskPaused$ = this.store.select(selectIsActiveTaskPaused);
+
+    this.isPlayButtonEnabled$ = combineLatest([
+      this.timerState$,
+      isTaskInputActive$,
+      isActiveTaskPaused$
+    ]).pipe(
+      map(([timerState, isTaskInputActive, isActiveTaskPaused]) =>
+        timerState.isRunning || isTaskInputActive || isActiveTaskPaused
+      )
+    );
   }
 
   ngOnInit() {
     this.timerState$.subscribe(state => {
-      this.duration = Math.floor(state.duration / 60);
+      this.duration = Math.floor(state.duration);
       this.isRunning = state.isRunning;
     });
   }
@@ -57,7 +74,7 @@ export class TimerComponent implements OnInit {
   }
 
   startTimer() {
-    this.store.dispatch(TimerActions.startTimer({ duration: this.duration * 60 }));
+    this.taskService.addTask(this.duration);
   }
 
   pauseTimer() {
@@ -65,7 +82,7 @@ export class TimerComponent implements OnInit {
   }
 
   resetTimer() {
-    this.store.dispatch(TimerActions.resetTimer({ duration: this.duration * 60 }));
+    this.store.dispatch(TimerActions.resetTimer({ duration: this.duration }));
   }
 
   stopTimer() {
@@ -73,7 +90,7 @@ export class TimerComponent implements OnInit {
   }
 
   changeDuration() {
-    this.store.dispatch(TimerActions.setDuration({ duration: this.duration * 60 }));
+    this.store.dispatch(TimerActions.setDuration({ duration: this.duration }));
   }
 
   formatTime(seconds: number): string {

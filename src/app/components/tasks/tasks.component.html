@@ -2,16 +2,24 @@
   <h2>Tasks</h2>
   <div class="task-input">
     <mat-form-field>
-      <input matInput [(ngModel)]="newTaskTitle" placeholder="New task" (keyup.enter)="addTask()">
+      <mat-form-field>
+        <input matInput
+               placeholder="New task"
+               [ngModel]="newTaskTitle$ | async"
+               (ngModelChange)="onTaskInputChange($event)"
+               (keyup.enter)="addTask()">
+      </mat-form-field>
     </mat-form-field>
-    <button mat-raised-button color="primary" (click)="addTask()">Add Task</button>
   </div>
-  <mat-list>
-    <mat-list-item *ngFor="let task of tasks">
-      <mat-checkbox (change)="toggleTask(task)" [checked]="task.completed">
-        {{ task.title }}
-      </mat-checkbox>
-      <button mat-icon-button color="warn" (click)="deleteTask(task.id)">
+  <mat-list cdkDropList (cdkDropListDropped)="onDrop($event)">
+    <mat-list-item *ngFor="let task of tasks$ | async" cdkDrag>
+      <span [class.active]="(activeTask$ | async)?.id === task.id">{{ task.title }}</span>
+      <span class="task-duration">{{ formatDuration(task.duration) }}</span>
+      <span class="task-state">{{ task.state }}</span>
+      <button mat-icon-button (click)="completeTask(task)" [disabled]="task.state === 'completed'">
+        <mat-icon>{{ getTaskIcon(task) }}</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="deleteTask(task.id)" [disabled]="task.state === 'active'">
         <mat-icon>delete</mat-icon>
       </button>
     </mat-list-item>

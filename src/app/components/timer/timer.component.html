@@ -2,7 +2,10 @@
   <h2 class="mat-display-4">{{ formatTime(timerState.remainingTime) }}</h2>
 
   <div class="controls">
-    <button mat-fab color="primary" (click)="toggleTimer()" [@rotateAnimation]="timerState.isRunning ? 'pause' : 'play'">
+    <button mat-fab color="primary"
+            (click)="toggleTimer()"
+            [disabled]="!(isPlayButtonEnabled$ | async)"
+            [@rotateAnimation]="timerState.isRunning ? 'pause' : 'play'">
       <mat-icon>{{ timerState.isRunning ? 'pause' : 'play_arrow' }}</mat-icon>
     </button>
 

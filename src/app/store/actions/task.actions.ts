@@ -12,3 +12,12 @@ export const setActiveTask = createAction('[Task] Set Active Task', props<{ task
 export const pauseActiveTask = createAction('[Task] Pause Active Task');
 export const completeActiveTask = createAction('[Task] Complete Active Task');
 export const updateTaskOrder = createAction('[Tasks] Update Task Order', props<{ tasks: Task[] }>());
+
+export const setTaskInputActive = createAction(
+  '[Task] Set Task Input Active',
+  props<{ isActive: boolean }>()
+);
+export const setNewTaskTitle = createAction(
+  '[Task] Set New Task Title',
+  props<{ title: string }>()
+);

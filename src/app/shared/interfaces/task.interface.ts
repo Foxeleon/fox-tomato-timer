@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   title: string;
   description?: string;
-  state: 'pending' | 'active' | 'paused' | 'completed';
+  state: 'completed' | 'active' | 'paused' | 'pending';
   categoryId?: string;
   duration: number;
   elapsedTime: number;

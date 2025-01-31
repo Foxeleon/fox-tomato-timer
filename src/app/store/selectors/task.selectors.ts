@@ -23,7 +23,17 @@ export const selectActiveTask = createSelector(
   (state: TaskState) => state.activeTask
 );
 
-export const selectHasActiveTask = createSelector(
-  selectActiveTask,
-  (activeTask) => !!activeTask
+export const selectIsActiveTaskPaused = createSelector(
+  selectTaskState,
+  (taskState) => taskState.activeTask?.state === 'paused'
+);
+
+export const selectIsTaskInputActive = createSelector(
+  selectTaskState,
+  (state: TaskState) => state.isTaskInputActive
+);
+
+export const selectNewTaskTitle = createSelector(
+  selectTaskState,
+  (state: TaskState) => state.newTaskTitle
 );
