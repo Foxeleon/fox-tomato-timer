@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, interval, BehaviorSubject, Subject, take, startWith } from 'rxjs';
 import { map, takeWhile, takeUntil, tap } from 'rxjs/operators';
 import * as TimerActions from '../../store/actions/timer.actions';
+import * as TasksActions from '../../store/actions/task.actions';
 import { Store } from '@ngrx/store';
 import { TimerState } from '../../store/reducers/timer.reducer';
 import { selectIsRunning } from '../../store/selectors/timer.selectors';
@@ -50,6 +51,7 @@ export class TimerService {
     this.pauseSubject.next();
     this.pauseSubject.complete();
     this.timerObservable = null;
+    this.store.dispatch(TasksActions.pauseActiveTask());
   }
 
   stopTimer() {

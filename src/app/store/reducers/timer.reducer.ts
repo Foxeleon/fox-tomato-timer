@@ -1,5 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import * as TimerActions from '../actions/timer.actions';
+import * as TaskActions from '../actions/task.actions';
 
 export interface TimerState {
   isRunning: boolean;
