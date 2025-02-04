@@ -1,6 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
 import * as TimerActions from '../actions/timer.actions';
-import * as TaskActions from '../actions/task.actions';
 
 export interface TimerState {
   isRunning: boolean;
@@ -10,8 +9,8 @@ export interface TimerState {
 
 export const initialState: TimerState = {
   isRunning: false,
-  duration: 25 * 60, // 25 minutes in seconds
-  remainingTime: 25 * 60,
+  duration: 25 * 60 * 1000, // 25 minutes in seconds in ms
+  remainingTime: 25 * 60 * 1000, // 25 minutes in seconds in ms
 };
 
 export const timerReducer = createReducer(

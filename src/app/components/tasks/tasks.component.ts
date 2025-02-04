@@ -14,6 +14,7 @@ import { selectAllTasks, selectActiveTask, selectNewTaskTitle } from '../../stor
 import { MatCheckbox } from '@angular/material/checkbox';
 import { selectDuration } from '../../store/selectors/timer.selectors';
 import { TaskService } from '../../shared/services/task.service';
+import { TimerService } from '../../shared/services/timer.service';
 
 @Component({
   selector: 'app-tasks',
@@ -37,21 +38,23 @@ export class TasksComponent implements OnInit, OnDestroy {
   duration$: Observable<number>;
   newTaskTitle$: Observable<string>;
 
-  private duration: number = 1500; // Значение по умолчанию (25 минут)
-  private durationSubscription: Subscription | undefined;
+  private duration: number; // Значение по умолчанию (25 минут)
+  private readonly durationSubscription: Subscription;
 
-  constructor(private store: Store, private taskService: TaskService) {
+  constructor(private store: Store, private taskService: TaskService, private timerService: TimerService) {
     this.tasks$ = this.store.select(selectAllTasks);
-    this.activeTask$ = this.store.select(selectActiveTask);
+    this.activeTask$ = this.taskService.getActiveTaskObservable();
     this.duration$ = this.store.select(selectDuration);
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
+
+    this.duration = this.timerService.getDuration();
+    this.durationSubscription = this.timerService.getDurationObservable().subscribe(duration => {
+      this.duration = duration;
+    });
   }
 
   ngOnInit() {
     this.store.dispatch(TasksActions.loadTasks());
-    this.durationSubscription = this.duration$.subscribe(duration => {
-      this.duration = duration;
-    });
   }
 
   ngOnDestroy() {
@@ -70,25 +73,16 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   completeTask(task: Task) {
+    if (task.state === 'active') {
+      this.store.dispatch(TasksActions.completeActiveTask());
+    } else
     if (task.state !== 'completed') {
       const completedTask: Task = {
         ...task,
-        state: 'completed',
-        elapsedTime: task.duration // Устанавливаем elapsed time равным duration при завершении
+        state: 'completed'
       };
       this.store.dispatch(TasksActions.updateTask({ task: completedTask }));
-
-      // Если завершенная задача была активной, сбрасываем активную задачу
-      this.activeTask$.subscribe(activeTask => {
-        if (activeTask && activeTask.id === task.id) {
-          this.store.dispatch(TasksActions.completeActiveTask());
-        }
-      }).unsubscribe();
     }
-  }
-
-  setActiveTask(taskId: string) {
-    this.store.dispatch(TasksActions.setActiveTask({ taskId }));
   }
 
   deleteTask(taskId: string) {
@@ -117,9 +111,9 @@ export class TasksComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatDuration(duration: number): string {
-    const minutes = Math.floor(duration / 60);
-    const seconds = duration % 60;
+  formatTaskElapsedTime(duration: number): string {
+    const seconds = Math.floor(duration / 1000);
+    const minutes = Math.floor(seconds / 60);
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 }

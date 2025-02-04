@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, Subscription } from 'rxjs';
 import * as TimerActions from '../../store/actions/timer.actions';
+import * as TaskActions from '../../store/actions/task.actions';
 import { TimerState } from '../../store/reducers/timer.reducer';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,8 +13,9 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { MatIconModule } from '@angular/material/icon';
 import { map } from 'rxjs/operators';
 import { selectIsActiveTaskPaused, selectIsTaskInputActive } from '../../store/selectors/task.selectors';
-import { selectDuration } from '../../store/selectors/timer.selectors';
 import { TaskService } from '../../shared/services/task.service';
+import { ActiveTask, Task } from '../../shared/interfaces/task.interface';
+import { TimerService } from '../../shared/services/timer.service';
 
 @Component({
   selector: 'app-timer',
@@ -36,14 +38,19 @@ import { TaskService } from '../../shared/services/task.service';
     ])
   ]
 })
-export class TimerComponent implements OnInit {
+
+export class TimerComponent implements OnInit, OnDestroy {
   timerState$: Observable<TimerState>;
-  duration: number = 25; // Default 25 minutes
+  duration$: Observable<number>;
+  duration: number;
   isRunning = false;
   isPlayButtonEnabled$: Observable<boolean>;
+  activeTask: ActiveTask | null;
 
-  constructor(private store: Store<{ timer: TimerState }>, private taskService: TaskService) {
-    this.timerState$ = store.select(state => state.timer);
+  private activeTaskSubscription: Subscription;
+
+  constructor(private store: Store<{ timer: TimerState }>, private taskService: TaskService, private timerService: TimerService) {
+    this.timerState$ = this.store.select(state => state.timer);
     const isTaskInputActive$ = this.store.select(selectIsTaskInputActive);
     const isActiveTaskPaused$ = this.store.select(selectIsActiveTaskPaused);
 
@@ -56,11 +63,20 @@ export class TimerComponent implements OnInit {
         timerState.isRunning || isTaskInputActive || isActiveTaskPaused
       )
     );
+    this.activeTask = this.taskService.getActiveTask();
+    this.activeTaskSubscription = this.taskService.getActiveTaskObservable().subscribe(task => {
+      this.activeTask = task;
+    });
+
+    this.duration = this.timerService.getDuration();
+    this.duration$ = this.timerService.getDurationObservable();
+    this.duration$.subscribe(duration => console.log('Duration timer component:', this.duration));
+
+  //   TODO add selectRemainingTime and selectIsRunning
   }
 
   ngOnInit() {
-    this.timerState$.subscribe(state => {
-      this.duration = Math.floor(state.duration);
+   this.timerState$.subscribe(state => {
       this.isRunning = state.isRunning;
     });
   }
@@ -74,7 +90,12 @@ export class TimerComponent implements OnInit {
   }
 
   startTimer() {
-    this.taskService.addTask(this.duration);
+    if (this.activeTask === null) {
+      this.taskService.addTask(this.duration);
+    } else {
+      this.taskService.setActiveTask(this.activeTask.id);
+      this.store.dispatch(TimerActions.startTimer({ duration: this.duration }));
+    }
   }
 
   pauseTimer() {
@@ -93,9 +114,15 @@ export class TimerComponent implements OnInit {
     this.store.dispatch(TimerActions.setDuration({ duration: this.duration }));
   }
 
-  formatTime(seconds: number): string {
+  formatTime(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
+    console.log('formatTime:', minutes, remainingSeconds);
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+
+  ngOnDestroy(): void {
+    this.activeTaskSubscription.unsubscribe();
   }
 }

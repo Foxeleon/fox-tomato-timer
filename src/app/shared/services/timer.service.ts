@@ -4,8 +4,7 @@ import { map, takeWhile, takeUntil, tap } from 'rxjs/operators';
 import * as TimerActions from '../../store/actions/timer.actions';
 import * as TasksActions from '../../store/actions/task.actions';
 import { Store } from '@ngrx/store';
-import { TimerState } from '../../store/reducers/timer.reducer';
-import { selectIsRunning } from '../../store/selectors/timer.selectors';
+import { selectDuration, selectIsRunning } from '../../store/selectors/timer.selectors';
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +15,13 @@ export class TimerService {
   private pauseSubject = new Subject<void>();
   private timerObservable: Observable<number> | null = null;
   isRunning$: Observable<boolean>;
+  duration$: Observable<number>;
+  duration: number = 25 * 60 * 1000; // Default 25 minutes in ms
 
   constructor(private store: Store) {
     this.isRunning$ = this.store.select(selectIsRunning);
+    this.duration$ = this.store.select(selectDuration);
+    this.duration$.subscribe(duration => this.duration = duration);
   }
 
   startTimer(duration?: number): Observable<number> {
@@ -67,6 +70,14 @@ export class TimerService {
       // Start a new timer with the current duration
       if (isRunning) this.store.dispatch(TimerActions.startTimer({ duration: this.currentDuration }));
     });
+  }
+
+  getDurationObservable(): Observable<number> {
+    return this.duration$;
+  }
+
+  getDuration(): number {
+    return this.duration;
   }
 
   setDuration(duration: number) {
