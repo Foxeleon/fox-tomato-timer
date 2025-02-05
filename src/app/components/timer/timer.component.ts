@@ -48,6 +48,7 @@ export class TimerComponent implements OnDestroy {
   activeTask: ActiveTask | null;
   formattedRemainingTime: string;
   remainingTime: number;
+  durationInput: string;
 
   private activeTaskSubscription: Subscription;
   private remainingTimeSubscription: Subscription;
@@ -81,6 +82,7 @@ export class TimerComponent implements OnDestroy {
     this.duration$.subscribe(duration => this.duration = duration);
 
     this.isRunningSubscription = this.isRunning$.subscribe(isRunning => this.isRunning = isRunning);
+    this.durationInput = this.formatTime(this.duration);
   }
 
   toggleTimer() {
@@ -113,15 +115,16 @@ export class TimerComponent implements OnDestroy {
     this.store.dispatch(TimerActions.stopTimer());
   }
 
-  changeDuration() {
-    this.store.dispatch(TimerActions.setDuration({ duration: this.duration }));
-  }
-
   formatTime(ms: number): string {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+
+  changeDurationInput() {
+    const [minutes, seconds] = this.durationInput.split(':').map(Number);
+    this.store.dispatch(TimerActions.setDuration({ duration: ((minutes * 60) + seconds) * 1000 }));
   }
 
   ngOnDestroy(): void {
