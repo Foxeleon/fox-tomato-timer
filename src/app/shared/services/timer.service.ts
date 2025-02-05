@@ -4,7 +4,7 @@ import { map, takeWhile, takeUntil, tap } from 'rxjs/operators';
 import * as TimerActions from '../../store/actions/timer.actions';
 import * as TasksActions from '../../store/actions/task.actions';
 import { Store } from '@ngrx/store';
-import { selectDuration, selectIsRunning } from '../../store/selectors/timer.selectors';
+import { selectDuration, selectIsRunning, selectRemainingTime } from '../../store/selectors/timer.selectors';
 
 @Injectable({
   providedIn: 'root'
@@ -17,11 +17,16 @@ export class TimerService {
   isRunning$: Observable<boolean>;
   duration$: Observable<number>;
   duration: number = 25 * 60 * 1000; // Default 25 minutes in ms
+  remainingTime$: Observable<number>;
+  remainingTime: number = 25 * 60 * 1000; // Default 25 minutes in ms
 
   constructor(private store: Store) {
     this.isRunning$ = this.store.select(selectIsRunning);
     this.duration$ = this.store.select(selectDuration);
     this.duration$.subscribe(duration => this.duration = duration);
+
+    this.remainingTime$ = this.store.select(selectRemainingTime);
+    this.remainingTime$.subscribe(duration => this.remainingTime = duration);
   }
 
   startTimer(duration?: number): Observable<number> {
@@ -38,7 +43,7 @@ export class TimerService {
       this.timerSubject.next(startValue);
 
       this.timerObservable = interval(1000).pipe(
-        map(tick => startValue - tick - 1), // Subtract 1 to account for the immediate emission
+        map(tick => startValue - tick*1000 - 1000), // Subtract 1 to account for the immediate emission
         takeWhile(remainingTime => remainingTime >= 0),
         takeUntil(this.pauseSubject),
         tap(remainingTime => this.timerSubject.next(remainingTime)),
@@ -78,6 +83,19 @@ export class TimerService {
 
   getDuration(): number {
     return this.duration;
+  }
+
+
+  getRemainingTimeObservable(): Observable<number> {
+    return this.remainingTime$;
+  }
+
+  getRemainingTime(): number {
+    return this.remainingTime;
+  }
+
+  getIsRunningObservable(): Observable<boolean> {
+    return this.isRunning$;
   }
 
   setDuration(duration: number) {

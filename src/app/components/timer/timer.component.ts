@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import * as TimerActions from '../../store/actions/timer.actions';
-import * as TaskActions from '../../store/actions/task.actions';
 import { TimerState } from '../../store/reducers/timer.reducer';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,46 +38,49 @@ import { TimerService } from '../../shared/services/timer.service';
   ]
 })
 
-export class TimerComponent implements OnInit, OnDestroy {
+export class TimerComponent implements OnDestroy {
   timerState$: Observable<TimerState>;
   duration$: Observable<number>;
   duration: number;
   isRunning = false;
+  isRunning$: Observable<boolean>;
   isPlayButtonEnabled$: Observable<boolean>;
   activeTask: ActiveTask | null;
+  formattedRemainingTime: string;
+  remainingTime: number;
 
   private activeTaskSubscription: Subscription;
+  private remainingTimeSubscription: Subscription;
+  private isRunningSubscription: Subscription;
 
   constructor(private store: Store<{ timer: TimerState }>, private taskService: TaskService, private timerService: TimerService) {
     this.timerState$ = this.store.select(state => state.timer);
     const isTaskInputActive$ = this.store.select(selectIsTaskInputActive);
     const isActiveTaskPaused$ = this.store.select(selectIsActiveTaskPaused);
+    this.isRunning$ = this.timerService.getIsRunningObservable();
 
     this.isPlayButtonEnabled$ = combineLatest([
-      this.timerState$,
+      this.isRunning$,
       isTaskInputActive$,
       isActiveTaskPaused$
     ]).pipe(
-      map(([timerState, isTaskInputActive, isActiveTaskPaused]) =>
-        timerState.isRunning || isTaskInputActive || isActiveTaskPaused
+      map(([isRunning, isTaskInputActive, isActiveTaskPaused]) =>
+        isRunning || isTaskInputActive || isActiveTaskPaused
       )
     );
+
     this.activeTask = this.taskService.getActiveTask();
-    this.activeTaskSubscription = this.taskService.getActiveTaskObservable().subscribe(task => {
-      this.activeTask = task;
-    });
+    this.activeTaskSubscription = this.taskService.getActiveTaskObservable().subscribe(task => this.activeTask = task);
+
+    this.remainingTime = this.timerService.getRemainingTime();
+    this.formattedRemainingTime = this.formatTime(timerService.getRemainingTime());
+    this.remainingTimeSubscription = this.timerService.getRemainingTimeObservable().subscribe(remainingTime => this.formattedRemainingTime = this.formatTime(remainingTime));
 
     this.duration = this.timerService.getDuration();
     this.duration$ = this.timerService.getDurationObservable();
-    this.duration$.subscribe(duration => console.log('Duration timer component:', this.duration));
+    this.duration$.subscribe(duration => this.duration = duration);
 
-  //   TODO add selectRemainingTime and selectIsRunning
-  }
-
-  ngOnInit() {
-   this.timerState$.subscribe(state => {
-      this.isRunning = state.isRunning;
-    });
+    this.isRunningSubscription = this.isRunning$.subscribe(isRunning => this.isRunning = isRunning);
   }
 
   toggleTimer() {
@@ -94,7 +96,8 @@ export class TimerComponent implements OnInit, OnDestroy {
       this.taskService.addTask(this.duration);
     } else {
       this.taskService.setActiveTask(this.activeTask.id);
-      this.store.dispatch(TimerActions.startTimer({ duration: this.duration }));
+      // TODO After pause starting of timer gives default remainingTime first time. Fix?
+      this.store.dispatch(TimerActions.startTimer({ duration: this.remainingTime }));
     }
   }
 
@@ -118,11 +121,12 @@ export class TimerComponent implements OnInit, OnDestroy {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    console.log('formatTime:', minutes, remainingSeconds);
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
   ngOnDestroy(): void {
     this.activeTaskSubscription.unsubscribe();
+    this.remainingTimeSubscription.unsubscribe();
+    this.isRunningSubscription.unsubscribe();
   }
 }
