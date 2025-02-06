@@ -18,7 +18,7 @@ export const timerReducer = createReducer(
   on(TimerActions.startTimer, (state, { duration }) => ({ ...state, duration, remainingTime: duration, isRunning: true })),
   on(TimerActions.pauseTimer, state => ({ ...state, isRunning: false })),
   on(TimerActions.resetTimer, (state, { duration }) => ({ ...state, duration, remainingTime: duration })),
-  on(TimerActions.setDuration, (state, { duration }) => ({ ...state, duration, remainingTime: duration })),
+  on(TimerActions.setDuration, (state, { duration }) => ({ ...state, duration })),
   on(TimerActions.tickTimer, (state, { remainingTime }) => ({ ...state, remainingTime })),
   on(TimerActions.stopTimer, state => ({...state, isRunning: false, remainingTime: state.duration })),
 );

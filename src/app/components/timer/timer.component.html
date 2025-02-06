@@ -18,8 +18,13 @@
     </button>
   </div>
 
-  <mat-form-field appearance="outline" class="duration-input">
-    <mat-label>Duration (minutes)</mat-label>
-    <input matInput type="text" [(ngModel)]="durationInput" (change)="changeDurationInput()" pattern="[0-5][0-9]:[0-5][0-9]" min="00:01" max="60:00">
+  <mat-form-field>
+    <input matInput [formControl]="durationInputControl" placeholder="Duration (mm:ss)">
+    <mat-error *ngIf="durationInputControl.invalid && durationInputControl.errors?.['required']">
+      Duration is required.
+    </mat-error>
+    <mat-error *ngIf="durationInputControl.invalid && durationInputControl.errors?.['pattern']">
+      Duration must be in the format mm:ss.
+    </mat-error>
   </mat-form-field>
 </div>

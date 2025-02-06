@@ -14,14 +14,20 @@ export class TimerService {
   private currentDuration: number = 0;
   private pauseSubject = new Subject<void>();
   private timerObservable: Observable<number> | null = null;
+
   isRunning$: Observable<boolean>;
+  isRunning = false;
+
   duration$: Observable<number>;
   duration: number = 25 * 60 * 1000; // Default 25 minutes in ms
+
   remainingTime$: Observable<number>;
   remainingTime: number = 25 * 60 * 1000; // Default 25 minutes in ms
 
   constructor(private store: Store) {
     this.isRunning$ = this.store.select(selectIsRunning);
+    this.isRunning$.subscribe(isRunning => this.isRunning = isRunning);
+
     this.duration$ = this.store.select(selectDuration);
     this.duration$.subscribe(duration => this.duration = duration);
 
@@ -71,10 +77,8 @@ export class TimerService {
     // Reset the timer to the current duration
     this.timerSubject.next(this.currentDuration);
 
-    this.isRunning$.pipe(take(1)).subscribe(isRunning => {
       // Start a new timer with the current duration
-      if (isRunning) this.store.dispatch(TimerActions.startTimer({ duration: this.currentDuration }));
-    });
+      if (this.isRunning) this.store.dispatch(TimerActions.startTimer({ duration: this.currentDuration }));
   }
 
   getDurationObservable(): Observable<number> {

@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { map } from 'rxjs/operators';
@@ -26,6 +26,7 @@ import { TimerService } from '../../shared/services/timer.service';
     MatFormFieldModule,
     FormsModule,
     MatIconModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './timer.component.html',
   styleUrls: ['./timer.component.scss'],
@@ -49,10 +50,9 @@ export class TimerComponent implements OnDestroy {
   formattedRemainingTime: string;
   remainingTime: number;
   durationInput: string;
+  durationInputControl: FormControl;
 
-  private activeTaskSubscription: Subscription;
-  private remainingTimeSubscription: Subscription;
-  private isRunningSubscription: Subscription;
+  private subscriptions: Subscription = new Subscription();
 
   constructor(private store: Store<{ timer: TimerState }>, private taskService: TaskService, private timerService: TimerService) {
     this.timerState$ = this.store.select(state => state.timer);
@@ -71,18 +71,29 @@ export class TimerComponent implements OnDestroy {
     );
 
     this.activeTask = this.taskService.getActiveTask();
-    this.activeTaskSubscription = this.taskService.getActiveTaskObservable().subscribe(task => this.activeTask = task);
+    this.subscriptions.add(this.taskService.getActiveTaskObservable().subscribe(task => this.activeTask = task));
 
     this.remainingTime = this.timerService.getRemainingTime();
     this.formattedRemainingTime = this.formatTime(timerService.getRemainingTime());
-    this.remainingTimeSubscription = this.timerService.getRemainingTimeObservable().subscribe(remainingTime => this.formattedRemainingTime = this.formatTime(remainingTime));
+    this.subscriptions.add(this.timerService.getRemainingTimeObservable().subscribe(remainingTime => this.formattedRemainingTime = this.formatTime(remainingTime)));
 
     this.duration = this.timerService.getDuration();
     this.duration$ = this.timerService.getDurationObservable();
     this.duration$.subscribe(duration => this.duration = duration);
 
-    this.isRunningSubscription = this.isRunning$.subscribe(isRunning => this.isRunning = isRunning);
+    this.subscriptions.add(this.isRunning$.subscribe(isRunning => this.isRunning = isRunning));
     this.durationInput = this.formatTime(this.duration);
+
+    this.durationInputControl = new FormControl(this.formatTime(this.duration), {
+      validators: [Validators.required, Validators.pattern(/^([0-5][0-9]):([0-5][0-9])$/)],
+      updateOn: 'blur'
+    });
+
+    this.durationInputControl.valueChanges.subscribe(durationInput => {
+      if (this.durationInputControl.valid) {
+        this.changeDurationInput(durationInput)
+      }
+    });
   }
 
   toggleTimer() {
@@ -122,14 +133,12 @@ export class TimerComponent implements OnDestroy {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
-  changeDurationInput() {
-    const [minutes, seconds] = this.durationInput.split(':').map(Number);
+  changeDurationInput(durationInput: string): void {
+    const [minutes, seconds] = durationInput.split(':').map(Number);
     this.store.dispatch(TimerActions.setDuration({ duration: ((minutes * 60) + seconds) * 1000 }));
   }
 
   ngOnDestroy(): void {
-    this.activeTaskSubscription.unsubscribe();
-    this.remainingTimeSubscription.unsubscribe();
-    this.isRunningSubscription.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 }
