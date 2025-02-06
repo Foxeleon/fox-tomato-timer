@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import * as TimerActions from '../../store/actions/timer.actions';
@@ -13,12 +13,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { map } from 'rxjs/operators';
 import { selectIsActiveTaskPaused, selectIsTaskInputActive } from '../../store/selectors/task.selectors';
 import { TaskService } from '../../shared/services/task.service';
-import { ActiveTask, Task } from '../../shared/interfaces/task.interface';
+import { ActiveTask } from '../../shared/interfaces/task.interface';
 import { TimerService } from '../../shared/services/timer.service';
 
 @Component({
   selector: 'app-timer',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     MatButtonModule,
@@ -126,6 +127,7 @@ export class TimerComponent implements OnDestroy {
     this.store.dispatch(TimerActions.stopTimer());
   }
 
+  // TODO create pipe to format time
   formatTime(ms: number): string {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
