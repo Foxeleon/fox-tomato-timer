@@ -86,7 +86,7 @@ export class TimerComponent implements OnDestroy {
     this.durationInput = this.formatTime(this.duration);
 
     this.durationInputControl = new FormControl(this.formatTime(this.duration), {
-      validators: [Validators.required, Validators.pattern(/^([0-5][0-9]):([0-5][0-9])$/)],
+      validators: [Validators.required, Validators.pattern(/^([0-9][0-9]):([0-5][0-9])$/)],
       updateOn: 'blur'
     });
 

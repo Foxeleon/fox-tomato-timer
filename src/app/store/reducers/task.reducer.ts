@@ -26,6 +26,24 @@ export const taskReducer = createReducer(
   on(TaskActions.updateTask, (state, { task }) => ({ ...state, tasks: state.tasks.map(t => t.id === task.id ? task : t) })),
   on(TaskActions.deleteTask, (state, { id }) => ({ ...state, tasks: state.tasks.filter(task => task.id !== id) })),
   on(TaskActions.stopTask, (state, { activeTask }) => ({ ...state, activeTask: null, tasks: state.tasks.map(t => t.id === activeTask.id ? activeTask : t) })),
+  on(TaskActions.patchTask, (state, { taskId, changes }) => {
+    const updatedTasks = state.tasks.map(task =>
+      task.id === taskId
+        ? { ...task, ...changes }
+        : task
+    );
+
+    // Обновляем activeTask, если он существует и совпадает с обновляемой задачей
+    const updatedActiveTask = state.activeTask && state.activeTask.id === taskId
+      ? { ...state.activeTask, ...changes }
+      : state.activeTask;
+
+    return {
+      ...state,
+      tasks: updatedTasks,
+      activeTask: updatedActiveTask
+    };
+  }),
 
   on(TaskActions.updateTaskOrder, (state, { tasks }) => ({ ...state, tasks })),
 

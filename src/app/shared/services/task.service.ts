@@ -39,6 +39,10 @@ export class TaskService {
     this.store.dispatch(TasksActions.setActiveTask({ taskId }));
   }
 
+  patchTask(taskId: string, changes: Partial<Task | ActiveTask>) {
+    this.store.dispatch(TasksActions.patchTask({ taskId, changes }));
+  }
+
   // TODO rewrite function with logic of ngrx store
   getTasks(): Observable<Task[]> {
     return this.tasksSubject.asObservable();

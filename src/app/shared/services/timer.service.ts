@@ -80,7 +80,8 @@ export class TimerService {
       const stopActiveTask = {
         ...activeTask,
         state: 'pending' as 'pending' | 'completed' | 'active' | 'paused',
-        startTime: startTime,
+        startTime,
+        elapsedTime: activeTask.elapsedTime + (Date.now() - startTime)
       };
       this.store.dispatch(TasksActions.stopTask({activeTask: stopActiveTask}));
     }

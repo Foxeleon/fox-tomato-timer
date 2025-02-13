@@ -24,7 +24,7 @@
       Duration is required.
     </mat-error>
     <mat-error *ngIf="durationInputControl.invalid && durationInputControl.errors?.['pattern']">
-      Duration must be in the format mm:ss.
+      Duration must be in the format mm:ss. (max 99:59)
     </mat-error>
   </mat-form-field>
 </div>
