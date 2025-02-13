@@ -5,7 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragSortEvent, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription, take, tap } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
@@ -35,19 +35,21 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   animations: [
     trigger('dragAnimation', [
       state('idle', style({
-        transform: 'scale(1)',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+        transform: 'translateY(0)',
+        boxShadow: 'none',
       })),
-      state('dragging', style({
-        transform: 'scale(1.05)',
-        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)'
+      state('draggingUp', style({
+        transform: 'translateY(-10px)',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
       })),
-      transition('idle => dragging', [
-        animate('200ms cubic-bezier(0.4, 0, 0.2, 1)')
-      ]),
-      transition('dragging => idle', [
-        animate('200ms cubic-bezier(0.4, 0, 0.2, 1)')
-      ])
+      state('draggingDown', style({
+        transform: 'translateY(10px)',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
+      })),
+      transition('idle => draggingUp', animate('200ms ease-in-out')),
+      transition('idle => draggingDown', animate('200ms ease-in-out')),
+      transition('draggingUp => idle', animate('200ms ease-in')),
+      transition('draggingDown => idle', animate('200ms ease-in'))
     ])
   ]
 })
@@ -57,6 +59,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   activeTask$: Observable<Task | null>;
   duration$: Observable<number>;
   newTaskTitle$: Observable<string>;
+  draggedDirection: 'draggingUp' | 'draggingDown' | 'idle' = 'idle';
 
   private duration: number; // Значение по умолчанию (25 минут)
   private readonly durationSubscription: Subscription;
@@ -97,12 +100,22 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   drop(event: CdkDragDrop<Task[]>) {
-    // Создаем новый массив и перемещаем элементы внутри.
     if (event.previousIndex !== event.currentIndex) {
-      const updatedTasks = [...this.tasks]; // Копируем массив
-      const [movedTask] = updatedTasks.splice(event.previousIndex, 1); // Удаляем элемент
-      updatedTasks.splice(event.currentIndex, 0, movedTask); // Вставляем на новое место
-      this.tasks = updatedTasks; // Обновляем массив
+      const updatedTasks = [...this.tasks];
+      const [movedTask] = updatedTasks.splice(event.previousIndex, 1); // Удаляем
+      updatedTasks.splice(event.currentIndex, 0, movedTask); // Вставляем
+      this.tasks = updatedTasks;
+    }
+    this.draggedDirection = 'idle';
+  }
+
+  onDragMoved(event: CdkDragSortEvent<Task[]>) {
+    if (event.previousIndex > event.currentIndex) {
+      this.draggedDirection = 'draggingUp';
+    } else if (event.previousIndex < event.currentIndex) {
+      this.draggedDirection = 'draggingDown';
+    } else {
+      this.draggedDirection = 'idle';
     }
   }
 

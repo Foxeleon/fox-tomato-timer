@@ -13,13 +13,12 @@
   </div>
   <div cdkDropList
        class="tasks-list"
-       (cdkDropListDropped)="drop($event)">
+       (cdkDropListDropped)="drop($event)"
+       (cdkDropListSorted)="onDragMoved($event)">
     <div class="task-item"
-         *ngFor="let task of tasks"
+         *ngFor="let task of tasks; let i = index"
          cdkDrag
-         [cdkDragData]="task"
-         [@dragAnimation]="'idle'"
-         cdkDragPreviewClass="task-preview">
+         [@dragAnimation]="draggedDirection">
       <div class="task-content">
         <span class="task-title">{{ task.title }}</span>
         <div class="task-actions">
@@ -31,7 +30,6 @@
           </button>
         </div>
       </div>
-      <div class="task-drag-placeholder" *cdkDragPlaceholder></div>
     </div>
   </div>
 </div>
