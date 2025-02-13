@@ -25,6 +25,9 @@ export const taskReducer = createReducer(
   on(TaskActions.addTask, (state, { task }) => ({ ...state, tasks: [...state.tasks, task] })),
   on(TaskActions.updateTask, (state, { task }) => ({ ...state, tasks: state.tasks.map(t => t.id === task.id ? task : t) })),
   on(TaskActions.deleteTask, (state, { id }) => ({ ...state, tasks: state.tasks.filter(task => task.id !== id) })),
+  on(TaskActions.stopTask, (state, { activeTask }) => ({ ...state, activeTask: null, tasks: state.tasks.map(t => t.id === activeTask.id ? activeTask : t) })),
+
+  on(TaskActions.updateTaskOrder, (state, { tasks }) => ({ ...state, tasks })),
 
   on(TaskActions.setNewTaskTitle, (state, { title }) => ({
     ...state,
@@ -58,7 +61,6 @@ export const taskReducer = createReducer(
     const completedTask: Task = { ...state.activeTask, state: 'completed', elapsedTime: state.activeTask.elapsedTime + (Date.now() - state.activeTask.startTime) };
     return { ...state, activeTask: null, tasks: state.tasks.map(t => t.id === completedTask.id ? completedTask : t) };
   }),
-  on(TaskActions.updateTaskOrder, (state, { tasks }) => ({ ...state, tasks })),
 
   on(TaskActions.loadTasks, state => ({ ...state, loading: true })),
   on(TaskActions.loadTasksSuccess, (state, { tasks }) => ({ ...state, tasks, loading: false })),

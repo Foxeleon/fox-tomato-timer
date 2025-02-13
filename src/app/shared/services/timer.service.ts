@@ -5,6 +5,8 @@ import * as TimerActions from '../../store/actions/timer.actions';
 import * as TasksActions from '../../store/actions/task.actions';
 import { Store } from '@ngrx/store';
 import { selectDuration, selectIsRunning, selectRemainingTime } from '../../store/selectors/timer.selectors';
+import { TaskService } from './task.service';
+import { ActiveTask, Task } from '../interfaces/task.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +26,7 @@ export class TimerService {
   remainingTime$: Observable<number>;
   remainingTime: number = 25 * 60 * 1000; // Default 25 minutes in ms
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private taskService: TaskService) {
     this.isRunning$ = this.store.select(selectIsRunning);
     this.isRunning$.subscribe(isRunning => this.isRunning = isRunning);
 
@@ -71,6 +73,17 @@ export class TimerService {
   stopTimer() {
     this.timerSubject.next(this.currentDuration);
     this.timerObservable = null;
+    const activeTask = this.taskService.getActiveTask();
+
+    if (activeTask) {
+      const startTime = activeTask.startTime || Date.now();
+      const stopActiveTask = {
+        ...activeTask,
+        state: 'pending' as 'pending' | 'completed' | 'active' | 'paused',
+        startTime: startTime,
+      };
+      this.store.dispatch(TasksActions.stopTask({activeTask: stopActiveTask}));
+    }
   }
 
   resetTimer() {
