@@ -44,7 +44,6 @@ export class TaskService {
   // TODO rewrite function with logic of ngrx store
   getTasks(): Observable<Task[]> {
     return this.store.select(selectAllTasks);
-    // return this.tasksSubject.asObservable();
   }
 
   addTask(duration: number) {

@@ -11,17 +11,27 @@
       </mat-form-field>
     </mat-form-field>
   </div>
-  <mat-list cdkDropList (cdkDropListDropped)="onDrop($event)">
-    <mat-list-item *ngFor="let task of tasks$ | async" cdkDrag>
-      <span [class.active]="(activeTask$ | async)?.id === task.id">{{ task.title }}</span>
-      <span class="task-duration">{{ task.elapsedTime === 0 ? formatTaskElapsedTime(task.duration) : formatTaskElapsedTime(task.elapsedTime) }}</span>
-      <span class="task-state">{{ task.state }}</span>
-      <button mat-icon-button (click)="completeTask(task)" [disabled]="task.state === 'completed' || 'active' || 'pause'">
-        <mat-icon>{{ getTaskIcon(task) }}</mat-icon>
-      </button>
-      <button mat-icon-button color="warn" (click)="deleteTask(task.id)" [disabled]="task.state === 'active' || 'pause'">
-        <mat-icon>delete</mat-icon>
-      </button>
-    </mat-list-item>
-  </mat-list>
+  <div cdkDropList
+       class="tasks-list"
+       (cdkDropListDropped)="drop($event)">
+    <div class="task-item"
+         *ngFor="let task of tasks"
+         cdkDrag
+         [cdkDragData]="task"
+         [@dragAnimation]="'idle'"
+         cdkDragPreviewClass="task-preview">
+      <div class="task-content">
+        <span class="task-title">{{ task.title }}</span>
+        <div class="task-actions">
+          <button mat-icon-button (click)="editTask(task)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteTask(task.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="task-drag-placeholder" *cdkDragPlaceholder></div>
+    </div>
+  </div>
 </div>

@@ -10,11 +10,12 @@ import { Store } from '@ngrx/store';
 import { Observable, Subscription, take, tap } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
 import * as TasksActions from '../../store/actions/task.actions';
-import { selectAllTasks, selectActiveTask, selectNewTaskTitle } from '../../store/selectors/task.selectors';
+import { selectNewTaskTitle } from '../../store/selectors/task.selectors';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { selectDuration } from '../../store/selectors/timer.selectors';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerService } from '../../shared/services/timer.service';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-tasks',
@@ -30,10 +31,29 @@ import { TimerService } from '../../shared/services/timer.service';
     MatCheckbox
   ],
   templateUrl: './tasks.component.html',
-  styleUrl: './tasks.component.scss'
+  styleUrl: './tasks.component.scss',
+  animations: [
+    trigger('dragAnimation', [
+      state('idle', style({
+        transform: 'scale(1)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+      })),
+      state('dragging', style({
+        transform: 'scale(1.05)',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)'
+      })),
+      transition('idle => dragging', [
+        animate('200ms cubic-bezier(0.4, 0, 0.2, 1)')
+      ]),
+      transition('dragging => idle', [
+        animate('200ms cubic-bezier(0.4, 0, 0.2, 1)')
+      ])
+    ])
+  ]
 })
 export class TasksComponent implements OnInit, OnDestroy {
   tasks$: Observable<Task[]>;
+  tasks: Task[] = [];
   activeTask$: Observable<Task | null>;
   duration$: Observable<number>;
   newTaskTitle$: Observable<string>;
@@ -42,12 +62,16 @@ export class TasksComponent implements OnInit, OnDestroy {
   private readonly durationSubscription: Subscription;
 
   constructor(private store: Store, private taskService: TaskService, private timerService: TimerService) {
-    this.tasks$ = this.store.select(selectAllTasks);
-    this.activeTask$ = this.store.select(selectActiveTask);
-    this.duration$ = this.store.select(selectDuration);
+    this.tasks$ = this.taskService.getTasks();
+    this.tasks$.subscribe(tasks => this.tasks = tasks);
+    this.activeTask$ = this.taskService.getActiveTaskObservable();
+    this.duration$ = this.timerService.getDurationObservable();
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
 
     this.duration = this.timerService.getDuration();
+    this.durationSubscription = this.timerService.getDurationObservable().subscribe(duration => {
+      this.duration = duration;
+    });
     this.durationSubscription = this.timerService.getDurationObservable().subscribe(duration => {
       this.duration = duration;
     });
@@ -70,6 +94,23 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   addTask() {
     if(!this.taskService.getActiveTask()) this.taskService.addTask(this.duration);
+  }
+
+  drop(event: CdkDragDrop<Task[]>) {
+    // Создаем новый массив и перемещаем элементы внутри.
+    if (event.previousIndex !== event.currentIndex) {
+      const updatedTasks = [...this.tasks]; // Копируем массив
+      const [movedTask] = updatedTasks.splice(event.previousIndex, 1); // Удаляем элемент
+      updatedTasks.splice(event.currentIndex, 0, movedTask); // Вставляем на новое место
+      this.tasks = updatedTasks; // Обновляем массив
+    }
+  }
+
+  editTask(task: Task) {
+    const updatedTitle = prompt('Введите новое название задачи:', task.title);
+    if (updatedTitle !== null && updatedTitle.trim() !== '') {
+      task.title = updatedTitle.trim(); // Обновляем название задачи
+    }
   }
 
   completeTask(task: Task) {
