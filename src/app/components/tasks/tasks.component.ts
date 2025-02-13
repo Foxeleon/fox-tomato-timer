@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, take, tap } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
 import * as TasksActions from '../../store/actions/task.actions';
 import { selectAllTasks, selectActiveTask, selectNewTaskTitle } from '../../store/selectors/task.selectors';
@@ -43,7 +43,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store, private taskService: TaskService, private timerService: TimerService) {
     this.tasks$ = this.store.select(selectAllTasks);
-    this.activeTask$ = this.taskService.getActiveTaskObservable();
+    this.activeTask$ = this.store.select(selectActiveTask);
     this.duration$ = this.store.select(selectDuration);
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
 
@@ -69,7 +69,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   addTask() {
-    this.taskService.addTask(this.duration);
+    if(!this.taskService.getActiveTask()) this.taskService.addTask(this.duration);
   }
 
   completeTask(task: Task) {
@@ -77,33 +77,32 @@ export class TasksComponent implements OnInit, OnDestroy {
       this.store.dispatch(TasksActions.completeActiveTask());
     } else
     if (task.state !== 'completed') {
-      const completedTask: Task = {
-        ...task,
-        state: 'completed'
-      };
-      this.store.dispatch(TasksActions.updateTask({ task: completedTask }));
+      this.taskService.patchTask(task.id, {state: 'completed'});
     }
   }
 
   deleteTask(taskId: string) {
-    this.store.dispatch(TasksActions.deleteTask({ id: taskId }));
+    this.taskService.deleteTask(taskId);
   }
 
   onDrop(event: CdkDragDrop<Task[]>) {
-    this.tasks$.subscribe(tasks => {
-      const newTasks = [...tasks];
-      moveItemInArray(newTasks, event.previousIndex, event.currentIndex);
-      const updatedTasks = newTasks.map((task, index) => ({ ...task, order: index }));
-      this.store.dispatch(TasksActions.updateTaskOrder({ tasks: updatedTasks }));
-    });
+    this.tasks$.pipe(
+      take(1),
+      tap(tasks => {
+        const newTasks = [...tasks];
+        moveItemInArray(newTasks, event.previousIndex, event.currentIndex);
+        const updatedTasks = newTasks.map((task, index) => ({ ...task, order: index }));
+        this.store.dispatch(TasksActions.updateTaskOrder({ tasks: updatedTasks }));
+      })
+    ).subscribe();
   }
 
   getTaskIcon(task: Task): string {
     switch (task.state) {
       case 'active':
-        return 'pause';
-      case 'paused':
         return 'play_arrow';
+      case 'paused':
+        return 'pause';
       case 'completed':
         return 'check';
       default:

@@ -10,8 +10,6 @@ import { selectActiveTask, selectAllTasks, selectNewTaskTitle } from '../../stor
   providedIn: 'root'
 })
 export class TaskService {
-  private tasks: Task[] = [];
-  private tasksSubject = new BehaviorSubject<Task[]>([]);
   newTaskTitle$: Observable<string>;
   activeTask$: Observable<ActiveTask | null>;
   activeTask: ActiveTask | null;
@@ -19,10 +17,6 @@ export class TaskService {
   constructor(private store: Store) {
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
     this.activeTask$ = this.store.select(selectActiveTask);
-    this.store.select(selectAllTasks).subscribe(tasks => {
-      this.tasks = tasks;
-      this.tasksSubject.next(tasks);
-    });
     this.activeTask = null
     this.activeTask$.subscribe(task => this.activeTask = task);
   }
@@ -35,6 +29,10 @@ export class TaskService {
     return this.activeTask;
   }
 
+  completeActiveTask() {
+    this.store.dispatch(TasksActions.completeActiveTask());
+  }
+
   setActiveTask(taskId: string) {
     this.store.dispatch(TasksActions.setActiveTask({ taskId }));
   }
@@ -45,7 +43,8 @@ export class TaskService {
 
   // TODO rewrite function with logic of ngrx store
   getTasks(): Observable<Task[]> {
-    return this.tasksSubject.asObservable();
+    return this.store.select(selectAllTasks);
+    // return this.tasksSubject.asObservable();
   }
 
   addTask(duration: number) {
@@ -71,19 +70,11 @@ export class TaskService {
     }).unsubscribe();
   }
 
-  // TODO rewrite function with logic of ngrx store
-  updateTask(updatedTask: Task): void {
+  updateWholeTask(updatedTask: Task): void {
     this.store.dispatch(TasksActions.updateTask({task: updatedTask}));
-    // const index = this.tasks.findIndex(task => task.id === updatedTask.id);
-    // if (index !== -1) {
-    //   this.tasks[index] = updatedTask;
-    //   this.tasksSubject.next([...this.tasks]);
-    // }
   }
 
-  // TODO rewrite function with logic of ngrx store
   deleteTask(taskId: string): void {
-    this.tasks = this.tasks.filter(task => task.id !== taskId);
-    this.tasksSubject.next([...this.tasks]);
+    this.store.dispatch(TasksActions.deleteTask({ id: taskId }));
   }
 }

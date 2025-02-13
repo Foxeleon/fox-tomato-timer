@@ -16,10 +16,10 @@
       <span [class.active]="(activeTask$ | async)?.id === task.id">{{ task.title }}</span>
       <span class="task-duration">{{ task.elapsedTime === 0 ? formatTaskElapsedTime(task.duration) : formatTaskElapsedTime(task.elapsedTime) }}</span>
       <span class="task-state">{{ task.state }}</span>
-      <button mat-icon-button (click)="completeTask(task)" [disabled]="task.state === 'completed'">
+      <button mat-icon-button (click)="completeTask(task)" [disabled]="task.state === 'completed' || 'active' || 'pause'">
         <mat-icon>{{ getTaskIcon(task) }}</mat-icon>
       </button>
-      <button mat-icon-button color="warn" (click)="deleteTask(task.id)" [disabled]="task.state === 'active'">
+      <button mat-icon-button color="warn" (click)="deleteTask(task.id)" [disabled]="task.state === 'active' || 'pause'">
         <mat-icon>delete</mat-icon>
       </button>
     </mat-list-item>
