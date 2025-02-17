@@ -63,6 +63,7 @@ export class TimerService {
     return this.timerObservable;
   }
 
+  //  TODO logic for task timers for pause with new variable counts sum of time of all intervals of session
   pauseTimer() {
     this.pauseSubject.next();
     this.pauseSubject.complete();
@@ -121,5 +122,12 @@ export class TimerService {
     if (this.timerSubject.value === 0) {
       this.timerSubject.next(duration);
     }
+  }
+
+  formatTime(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 }

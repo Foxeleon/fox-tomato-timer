@@ -45,27 +45,27 @@ export class TasksComponent implements OnInit, OnDestroy {
   tasks$: Observable<Task[]>;
   tasks: Task[] = [];
   activeTask$: Observable<Task | null>;
-  duration$: Observable<number>;
   newTaskTitle$: Observable<string>;
   draggedDirection: 'draggingUp' | 'draggingDown' | 'idle' = 'idle';
 
   private duration: number; // Значение по умолчанию (25 минут)
-  private readonly durationSubscription: Subscription;
+  remainingTime: number; // Значение по умолчанию (25 минут)
+  private readonly subscriptions: Subscription = new Subscription();
 
   constructor(private store: Store, private taskService: TaskService, private timerService: TimerService) {
     this.tasks$ = this.taskService.getTasks();
     this.tasks$.subscribe(tasks => this.tasks = tasks);
     this.activeTask$ = this.taskService.getActiveTaskObservable();
-    this.duration$ = this.timerService.getDurationObservable();
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
 
     this.duration = this.timerService.getDuration();
-    this.durationSubscription = this.timerService.getDurationObservable().subscribe(duration => {
+    this.remainingTime = this.timerService.getRemainingTime();
+    this.subscriptions.add(this.timerService.getDurationObservable().subscribe(duration => {
       this.duration = duration;
-    });
-    this.durationSubscription = this.timerService.getDurationObservable().subscribe(duration => {
-      this.duration = duration;
-    });
+    }));
+    this.subscriptions.add(this.timerService.getRemainingTimeObservable().subscribe(remainingTime => {
+      this.remainingTime = remainingTime;
+    }));
   }
 
   ngOnInit() {
@@ -73,8 +73,8 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.durationSubscription) {
-      this.durationSubscription.unsubscribe();
+    if (this.subscriptions) {
+      this.subscriptions.unsubscribe();
     }
   }
 
@@ -127,18 +127,6 @@ export class TasksComponent implements OnInit, OnDestroy {
     this.taskService.deleteTask(taskId);
   }
 
-  onDrop(event: CdkDragDrop<Task[]>) {
-    this.tasks$.pipe(
-      take(1),
-      tap(tasks => {
-        const newTasks = [...tasks];
-        moveItemInArray(newTasks, event.previousIndex, event.currentIndex);
-        const updatedTasks = newTasks.map((task, index) => ({ ...task, order: index }));
-        this.store.dispatch(TasksActions.updateTaskOrder({ tasks: updatedTasks }));
-      })
-    ).subscribe();
-  }
-
   getTaskIcon(task: Task): string {
     switch (task.state) {
       case 'active':
@@ -152,9 +140,8 @@ export class TasksComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatTaskElapsedTime(duration: number): string {
-    const seconds = Math.floor(duration / 1000);
-    const minutes = Math.floor(seconds / 60);
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  formatTime(duration: number): string {
+    return this.timerService.formatTime(duration);
   }
+
 }

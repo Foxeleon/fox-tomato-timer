@@ -20,6 +20,7 @@
          [@dragAnimation]="draggedDirection">
       <div class="task-content">
         <span class="task-title">{{ task.title }}</span>
+        <span class="task-duration">{{ task.elapsedTime === 0? 'Remaining time: ' + formatTime(this.remainingTime) : 'Elapsed time: ' + formatTime(task.elapsedTime) }}</span>
         <div class="task-actions">
           <button mat-icon-button (click)="editTask(task)">
             <mat-icon>edit</mat-icon>

@@ -75,17 +75,17 @@ export class TimerComponent implements OnDestroy {
     this.subscriptions.add(this.taskService.getActiveTaskObservable().subscribe(task => this.activeTask = task));
 
     this.remainingTime = this.timerService.getRemainingTime();
-    this.formattedRemainingTime = this.formatTime(timerService.getRemainingTime());
-    this.subscriptions.add(this.timerService.getRemainingTimeObservable().subscribe(remainingTime => this.formattedRemainingTime = this.formatTime(remainingTime)));
+    this.formattedRemainingTime = this.timerService.formatTime(timerService.getRemainingTime());
+    this.subscriptions.add(this.timerService.getRemainingTimeObservable().subscribe(remainingTime => this.formattedRemainingTime = this.timerService.formatTime(remainingTime)));
 
     this.duration = this.timerService.getDuration();
     this.duration$ = this.timerService.getDurationObservable();
     this.duration$.subscribe(duration => this.duration = duration);
 
     this.subscriptions.add(this.isRunning$.subscribe(isRunning => this.isRunning = isRunning));
-    this.durationInput = this.formatTime(this.duration);
+    this.durationInput = this.timerService.formatTime(this.duration);
 
-    this.durationInputControl = new FormControl(this.formatTime(this.duration), {
+    this.durationInputControl = new FormControl(this.timerService.formatTime(this.duration), {
       validators: [Validators.required, Validators.pattern(/^([0-9][0-9]):([0-5][0-9])$/)],
       updateOn: 'blur'
     });
@@ -124,13 +124,6 @@ export class TimerComponent implements OnDestroy {
 
   stopTimer() {
     this.store.dispatch(TimerActions.stopTimer());
-  }
-
-  formatTime(ms: number): string {
-    const seconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
   changeDurationInput(durationInput: string): void {
