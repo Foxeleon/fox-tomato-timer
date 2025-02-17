@@ -7,7 +7,8 @@
                placeholder="New task"
                [ngModel]="newTaskTitle$ | async"
                (ngModelChange)="onTaskInputChange($event)"
-               (keyup.enter)="addTask()">
+               (keyup.enter)="addTask()"
+        >
       </mat-form-field>
     </mat-form-field>
   </div>

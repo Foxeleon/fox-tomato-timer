@@ -34,18 +34,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   styleUrl: './tasks.component.scss',
   animations: [
     trigger('dragAnimation', [
-      state('idle', style({
-        transform: 'translateY(0)',
-        boxShadow: 'none',
-      })),
-      state('draggingUp', style({
-        transform: 'translateY(-10px)',
-        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
-      })),
-      state('draggingDown', style({
-        transform: 'translateY(10px)',
-        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
-      })),
       transition('idle => draggingUp', animate('200ms ease-in-out')),
       transition('idle => draggingDown', animate('200ms ease-in-out')),
       transition('draggingUp => idle', animate('200ms ease-in')),

@@ -110,7 +110,6 @@ export class TimerComponent implements OnDestroy {
       this.taskService.addTask(this.duration);
     } else {
       this.taskService.setActiveTask(this.activeTask.id);
-      // TODO After pause starting of timer gives default remainingTime first time. Fix?
       this.store.dispatch(TimerActions.startTimer({ duration: this.remainingTime }));
     }
   }
@@ -127,7 +126,6 @@ export class TimerComponent implements OnDestroy {
     this.store.dispatch(TimerActions.stopTimer());
   }
 
-  // TODO create pipe to format time
   formatTime(ms: number): string {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
