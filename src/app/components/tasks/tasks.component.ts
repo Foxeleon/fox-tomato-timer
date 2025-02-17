@@ -14,8 +14,7 @@ import { selectNewTaskTitle } from '../../store/selectors/task.selectors';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerService } from '../../shared/services/timer.service';
-import { animate, state, style, transition, trigger } from '@angular/animations';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { animate, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-tasks',

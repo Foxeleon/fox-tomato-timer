@@ -6,7 +6,6 @@ import * as TasksActions from '../../store/actions/task.actions';
 import { Store } from '@ngrx/store';
 import { selectDuration, selectIsRunning, selectRemainingTime } from '../../store/selectors/timer.selectors';
 import { TaskService } from './task.service';
-import { ActiveTask, Task } from '../interfaces/task.interface';
 
 @Injectable({
   providedIn: 'root'
