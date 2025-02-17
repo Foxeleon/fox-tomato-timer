@@ -1,46 +1,121 @@
 .tasks-container {
   padding: 20px;
-  max-width: 800px;
+  max-width: 600px; /* Сузим контейнер для улучшения читаемости */
   margin: 0 auto;
+  background-color: #ffffff; /* Белый фон для контейнера */
+  border-radius: 12px; /* Увеличим скругления */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Тень для улучшения визуальной структуры */
+}
+
+.task-input {
+  display: flex;
+  flex-direction: column; /* Ввод располагается вертикально */
+  margin-bottom: 20px;
+}
+
+.task-input mat-form-field {
+  width: 100%; /* Поле ввода занимает всё пространство */
+}
+
+mat-form-field {
+  background: #ffffff; /* Белый фон поля */
+  border-radius: 8px; /* Скруглённые углы */
+  padding: 5px 12px; /* Внутренние отступы */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Лёгкая тень */
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+mat-form-field.mat-focused {
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.3); /* Голубая тень при фокусе */
+  border: 1px solid #4a90e2; /* Цветовая рамка при фокусе */
+}
+
+input[matInput] {
+  font-size: 16px; /* Размер текста */
+  padding: 12px; /* Удобные отступы */
+  border: none;
+  outline: none;
+}
+
+input[matInput]::placeholder {
+  font-size: 14px;
+  color: #aaa; /* Лёгкий оттенок для текста placeholder */
+}
+
+input[matInput]:focus::placeholder {
+  color: transparent; /* Исчезает placeholder при фокусе */
+}
+
+.task-input input {
+  flex: 1;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:focus {
+    border-color: #4a90e2; /* Цвет рамки при фокусе */
+    box-shadow: 0 0 5px #4a90e2; /* Мягкий акцент на фокусе */
+  }
+}
+
+.task-input button {
+  padding: 12px 20px;
+  font-size: 14px;
+  color: #ffffff;
+  background-color: #4a90e2;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #357abd; /* Более тёмный цвет на ховере */
+  }
 }
 
 .tasks-list {
-  background: #f5f5f5;
-  border-radius: 8px;
+  background: #f9f9f9; /* Светло-серый фон для разделения визуальных областей */
+  border-radius: 12px; /* Более приятные скругления */
   padding: 16px;
-  min-height: 60px;
+  min-height: 100px; /* Больше пространства для отображения пустых списков */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .task-item {
-  background: white;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Лёгкая тень для отделения задач */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: move;
+  cursor: grab;
 
   &:last-child {
     margin-bottom: 0;
   }
 
   &:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Увеличение тени при наведении */
   }
 
-  // Анимация для перетаскиваемого элемента
   &.cdk-drag-preview {
     transform: scale(1.05);
     z-index: 10;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3); /* Чёткий акцент на перетаскиваемом элементе */
   }
 
-  // Плейсхолдер во время перетаскивания
   &.cdk-drag-placeholder {
-    border: 2px dashed #ccc;
-    background: #e0e0e0;
-    border-radius: 4px;
+    border: 2px dashed #ccc; /* Декоративная рамка для placeholder */
+    background: #f0f0f0;
+    border-radius: 8px;
     min-height: 50px;
+    padding: 14px;
   }
 }
 
@@ -48,30 +123,38 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .task-title {
   font-size: 16px;
-  color: #333;
+  font-weight: 500;
+  color: #444;
+  overflow: hidden; /* Обрезаем текст, если длинный */
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .task-actions {
   display: flex;
   gap: 8px;
+}
 
-  button {
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: #666;
-    transition: color 0.2s ease;
+.task-actions button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease, background-color 0.2s ease;
 
-    &:hover {
-      color: #333;
-    }
+  &:hover {
+    color: #4a90e2; /* Акцентный цвет при наведении */
+    background-color: rgba(74, 144, 226, 0.1); /* Полупрозрачный акцент */
+  }
 
-    mat-icon {
-      font-size: 20px;
-    }
+  mat-icon {
+    font-size: 20px;
   }
 }
