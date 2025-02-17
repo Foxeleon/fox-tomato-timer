@@ -5,7 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragSortEvent, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription, take, tap } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
@@ -34,20 +34,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   styleUrl: './tasks.component.scss',
   animations: [
     trigger('dragAnimation', [
-      state('idle', style({
-        transform: 'scale(1)',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-      })),
-      state('dragging', style({
-        transform: 'scale(1.05)',
-        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)'
-      })),
-      transition('idle => dragging', [
-        animate('200ms cubic-bezier(0.4, 0, 0.2, 1)')
-      ]),
-      transition('dragging => idle', [
-        animate('200ms cubic-bezier(0.4, 0, 0.2, 1)')
-      ])
+      transition('idle => draggingUp', animate('200ms ease-in-out')),
+      transition('idle => draggingDown', animate('200ms ease-in-out')),
+      transition('draggingUp => idle', animate('200ms ease-in')),
+      transition('draggingDown => idle', animate('200ms ease-in'))
     ])
   ]
 })
@@ -55,26 +45,27 @@ export class TasksComponent implements OnInit, OnDestroy {
   tasks$: Observable<Task[]>;
   tasks: Task[] = [];
   activeTask$: Observable<Task | null>;
-  duration$: Observable<number>;
   newTaskTitle$: Observable<string>;
+  draggedDirection: 'draggingUp' | 'draggingDown' | 'idle' = 'idle';
 
   private duration: number; // Значение по умолчанию (25 минут)
-  private readonly durationSubscription: Subscription;
+  remainingTime: number; // Значение по умолчанию (25 минут)
+  private readonly subscriptions: Subscription = new Subscription();
 
   constructor(private store: Store, private taskService: TaskService, private timerService: TimerService) {
     this.tasks$ = this.taskService.getTasks();
     this.tasks$.subscribe(tasks => this.tasks = tasks);
     this.activeTask$ = this.taskService.getActiveTaskObservable();
-    this.duration$ = this.timerService.getDurationObservable();
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
 
     this.duration = this.timerService.getDuration();
-    this.durationSubscription = this.timerService.getDurationObservable().subscribe(duration => {
+    this.remainingTime = this.timerService.getRemainingTime();
+    this.subscriptions.add(this.timerService.getDurationObservable().subscribe(duration => {
       this.duration = duration;
-    });
-    this.durationSubscription = this.timerService.getDurationObservable().subscribe(duration => {
-      this.duration = duration;
-    });
+    }));
+    this.subscriptions.add(this.timerService.getRemainingTimeObservable().subscribe(remainingTime => {
+      this.remainingTime = remainingTime;
+    }));
   }
 
   ngOnInit() {
@@ -82,8 +73,8 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.durationSubscription) {
-      this.durationSubscription.unsubscribe();
+    if (this.subscriptions) {
+      this.subscriptions.unsubscribe();
     }
   }
 
@@ -97,12 +88,22 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   drop(event: CdkDragDrop<Task[]>) {
-    // Создаем новый массив и перемещаем элементы внутри.
     if (event.previousIndex !== event.currentIndex) {
-      const updatedTasks = [...this.tasks]; // Копируем массив
-      const [movedTask] = updatedTasks.splice(event.previousIndex, 1); // Удаляем элемент
-      updatedTasks.splice(event.currentIndex, 0, movedTask); // Вставляем на новое место
-      this.tasks = updatedTasks; // Обновляем массив
+      const updatedTasks = [...this.tasks];
+      const [movedTask] = updatedTasks.splice(event.previousIndex, 1); // Удаляем
+      updatedTasks.splice(event.currentIndex, 0, movedTask); // Вставляем
+      this.tasks = updatedTasks;
+    }
+    this.draggedDirection = 'idle';
+  }
+
+  onDragMoved(event: CdkDragSortEvent<Task[]>) {
+    if (event.previousIndex > event.currentIndex) {
+      this.draggedDirection = 'draggingUp';
+    } else if (event.previousIndex < event.currentIndex) {
+      this.draggedDirection = 'draggingDown';
+    } else {
+      this.draggedDirection = 'idle';
     }
   }
 
@@ -126,18 +127,6 @@ export class TasksComponent implements OnInit, OnDestroy {
     this.taskService.deleteTask(taskId);
   }
 
-  onDrop(event: CdkDragDrop<Task[]>) {
-    this.tasks$.pipe(
-      take(1),
-      tap(tasks => {
-        const newTasks = [...tasks];
-        moveItemInArray(newTasks, event.previousIndex, event.currentIndex);
-        const updatedTasks = newTasks.map((task, index) => ({ ...task, order: index }));
-        this.store.dispatch(TasksActions.updateTaskOrder({ tasks: updatedTasks }));
-      })
-    ).subscribe();
-  }
-
   getTaskIcon(task: Task): string {
     switch (task.state) {
       case 'active':
@@ -151,9 +140,8 @@ export class TasksComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatTaskElapsedTime(duration: number): string {
-    const seconds = Math.floor(duration / 1000);
-    const minutes = Math.floor(seconds / 60);
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  formatTime(duration: number): string {
+    return this.timerService.formatTime(duration);
   }
+
 }
