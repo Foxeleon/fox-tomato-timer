@@ -1,8 +1,11 @@
 <div class="timer" *ngIf="timerState$ | async as timerState">
-  <h2 class="mat-display-4">{{ formatTime(timerState.remainingTime) }}</h2>
+  <h2 class="mat-display-4">{{ this.formattedRemainingTime }}</h2>
 
   <div class="controls">
-    <button mat-fab color="primary" (click)="toggleTimer()" [@rotateAnimation]="timerState.isRunning ? 'pause' : 'play'">
+    <button mat-fab color="primary"
+            (click)="toggleTimer()"
+            [disabled]="!(isPlayButtonEnabled$ | async)"
+            [@rotateAnimation]="timerState.isRunning ? 'pause' : 'play'">
       <mat-icon>{{ timerState.isRunning ? 'pause' : 'play_arrow' }}</mat-icon>
     </button>
 
@@ -15,8 +18,13 @@
     </button>
   </div>
 
-  <mat-form-field appearance="outline" class="duration-input">
-    <mat-label>Duration (minutes)</mat-label>
-    <input matInput type="number" [(ngModel)]="duration" (change)="changeDuration()" min="1" max="60">
+  <mat-form-field>
+    <input matInput [formControl]="durationInputControl" placeholder="Duration (mm:ss)">
+    <mat-error *ngIf="durationInputControl.invalid && durationInputControl.errors?.['required']">
+      Duration is required.
+    </mat-error>
+    <mat-error *ngIf="durationInputControl.invalid && durationInputControl.errors?.['pattern']">
+      Duration must be in the format mm:ss. (max 99:59)
+    </mat-error>
   </mat-form-field>
 </div>

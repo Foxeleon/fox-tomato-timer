@@ -9,8 +9,8 @@ export interface TimerState {
 
 export const initialState: TimerState = {
   isRunning: false,
-  duration: 25 * 60, // 25 minutes in seconds
-  remainingTime: 25 * 60,
+  duration: 25 * 60 * 1000, // 25 minutes in seconds in ms
+  remainingTime: 25 * 60 * 1000, // 25 minutes in seconds in ms
 };
 
 export const timerReducer = createReducer(
@@ -18,7 +18,7 @@ export const timerReducer = createReducer(
   on(TimerActions.startTimer, (state, { duration }) => ({ ...state, duration, remainingTime: duration, isRunning: true })),
   on(TimerActions.pauseTimer, state => ({ ...state, isRunning: false })),
   on(TimerActions.resetTimer, (state, { duration }) => ({ ...state, duration, remainingTime: duration })),
-  on(TimerActions.setDuration, (state, { duration }) => ({ ...state, duration, remainingTime: duration })),
+  on(TimerActions.setDuration, (state, { duration }) => ({ ...state, duration })),
   on(TimerActions.tickTimer, (state, { remainingTime }) => ({ ...state, remainingTime })),
-  on(TimerActions.stopTimer, state => ({...state, isRunning: false, remainingTime: state.duration })),
+  on(TimerActions.stopTimer, state => ({...state, activeTask: null, isRunning: false, remainingTime: state.duration })),
 );
