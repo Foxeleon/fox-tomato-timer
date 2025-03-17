@@ -1,5 +1,90 @@
 # FoxTomatoTimer
 
+**Pomodoro technique timer application**
+
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Angular](https://img.shields.io/badge/Angular-18.2.10-red)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+## 📋 About the Project
+
+FoxTomatoTimer is a productivity application based on the Pomodoro technique. The concept is simple: work with full concentration for a certain period of time, then take a short break. After several such cycles, take a longer break.
+
+## ✨ Features
+
+- **⏱️ Customizable intervals** for work and rest
+- **📊 Productivity statistics** to analyze your work
+- **🔔 Notifications** about the beginning and end of intervals
+- **🧩 Intuitive interface** with a pleasant user experience
+
+## 🛠️ Technologies
+
+- **TypeScript** (89.4%)
+- **HTML** (5.4%)
+- **SCSS** (5.2%)
+- **Angular** (version 18.2.10)
+- **NgRx** for application state management
+
+## 🚀 Getting Started
+
+### Requirements
+
+- Node.js
+- npm or yarn
+
+### Installation and Launch
+
+```bash
+# Clone the repository
+git clone https://github.com/Foxeleon/fox-tomato-timer.git
+cd fox-tomato-timer
+
+# Install dependencies
+npm install
+
+# Run in development mode
+ng serve
+```
+
+Open `http://localhost:4200/` in your browser.
+
+## 🔍 Development
+
+### Development server
+
+Run `ng serve` for a development server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+
+### Code scaffolding
+
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+
+### Build
+
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+
+### Testing
+
+Run `ng test` to execute unit tests via Karma.
+
+## 📋 Development Plans
+
+- Browser extension for Chrome/Chromium
+- Web version with full functionality
+- Mobile applications for Android and iOS
+- Telegram integration (mini-app)
+
+## 📄 License
+
+This project is distributed under the MIT license.
+
+## 👨‍💻 Author
+
+- [Foxeleon](https://github.com/Foxeleon)
+
+---
+
+💡 **The Pomodoro Technique** was developed by Francesco Cirillo in the late 1980s and got its name from the tomato-shaped timer he used during his university studies.
+
 **Приложение-таймер для техники Pomodoro (помидорной техники)**
 
 ![Версия](https://img.shields.io/badge/версия-0.1.0-blue)
