@@ -17,27 +17,26 @@ import { ActiveTask } from '../../shared/interfaces/task.interface';
 import { TimerService } from '../../shared/services/timer.service';
 
 @Component({
-  selector: 'app-timer',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatInputModule,
-    MatFormFieldModule,
-    FormsModule,
-    MatIconModule,
-    ReactiveFormsModule,
-  ],
-  templateUrl: './timer.component.html',
-  styleUrls: ['./timer.component.scss'],
-  animations: [
-    trigger('rotateAnimation', [
-      state('play', style({ transform: 'rotate(0deg)' })),
-      state('pause', style({ transform: 'rotate(180deg)' })),
-      transition('play <=> pause', animate('300ms ease-in-out'))
-    ])
-  ]
+    selector: 'app-timer',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatInputModule,
+        MatFormFieldModule,
+        FormsModule,
+        MatIconModule,
+        ReactiveFormsModule,
+    ],
+    templateUrl: './timer.component.html',
+    styleUrls: ['./timer.component.scss'],
+    animations: [
+        trigger('rotateAnimation', [
+            state('play', style({ transform: 'rotate(0deg)' })),
+            state('pause', style({ transform: 'rotate(180deg)' })),
+            transition('play <=> pause', animate('300ms ease-in-out'))
+        ])
+    ]
 })
 
 export class TimerComponent implements OnDestroy {

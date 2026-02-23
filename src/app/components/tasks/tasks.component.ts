@@ -17,28 +17,27 @@ import { TimerService } from '../../shared/services/timer.service';
 import { animate, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'app-tasks',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatInputModule,
-    MatButtonModule,
-    MatListModule,
-    MatIconModule,
-    DragDropModule,
-    MatCheckbox
-  ],
-  templateUrl: './tasks.component.html',
-  styleUrl: './tasks.component.scss',
-  animations: [
-    trigger('dragAnimation', [
-      transition('idle => draggingUp', animate('200ms ease-in-out')),
-      transition('idle => draggingDown', animate('200ms ease-in-out')),
-      transition('draggingUp => idle', animate('200ms ease-in')),
-      transition('draggingDown => idle', animate('200ms ease-in'))
-    ])
-  ]
+    selector: 'app-tasks',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatInputModule,
+        MatButtonModule,
+        MatListModule,
+        MatIconModule,
+        DragDropModule,
+        MatCheckbox
+    ],
+    templateUrl: './tasks.component.html',
+    styleUrl: './tasks.component.scss',
+    animations: [
+        trigger('dragAnimation', [
+            transition('idle => draggingUp', animate('200ms ease-in-out')),
+            transition('idle => draggingDown', animate('200ms ease-in-out')),
+            transition('draggingUp => idle', animate('200ms ease-in')),
+            transition('draggingDown => idle', animate('200ms ease-in'))
+        ])
+    ]
 })
 export class TasksComponent implements OnInit, OnDestroy {
   tasks$: Observable<Task[]>;
