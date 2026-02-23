@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideMockStore } from '@ngrx/store/testing';
 
 import { TimerComponent } from './timer.component';
+import { initialState } from '../../store/reducers/task.reducer';
 
 describe('TimerComponent', () => {
   let component: TimerComponent;
@@ -10,7 +11,7 @@ describe('TimerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TimerComponent],
-      providers: [provideMockStore({})]
+      providers: [provideMockStore({ initialState: { tasks: initialState } })]
     })
     .compileComponents();
 
