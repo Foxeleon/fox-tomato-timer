@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@angular-builders/jest": "21.0.3",
-    "@angular/build": "^21.1.4",
+    "@angular/build": "21.1.4",
     "@angular/cli": "21.1.4",
     "@angular/compiler-cli": "21.1.5",
     "@angular/language-service": "21.1.5",
@@ -42,13 +42,7 @@
   },
   "pnpm": {
     "peerDependencyRules": {
-      "ignoreMissing": [
-        "karma",
-        "karma-*"
-      ]
-    },
-    "overrides": {
-      "karma": "-"
+      "ignoreMissing": []
     }
   }
 }

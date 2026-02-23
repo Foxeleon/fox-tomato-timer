@@ -3,7 +3,7 @@
 **Pomodoro technique timer application**
 
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
-![Angular](https://img.shields.io/badge/Angular-18.2.10-red)
+![Angular](https://img.shields.io/badge/Angular-21.1.5-red)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 📋 About the Project
@@ -22,15 +22,15 @@ FoxTomatoTimer is a productivity application based on the Pomodoro technique. Th
 - **TypeScript** (89.4%)
 - **HTML** (5.4%)
 - **SCSS** (5.2%)
-- **Angular** (version 18.2.10)
+- **Angular** (version 21.1.5)
 - **NgRx** for application state management
 
 ## 🚀 Getting Started
 
 ### Requirements
 
-- Node.js
-- npm or yarn
+- Node.js 20.20.0
+- pnpm 10.28.1
 
 ### Installation and Launch
 
@@ -40,10 +40,10 @@ git clone https://github.com/Foxeleon/fox-tomato-timer.git
 cd fox-tomato-timer
 
 # Install dependencies
-npm install
+pnpm install
 
 # Run in development mode
-ng serve
+pnpm start
 ```
 
 Open `http://localhost:4200/` in your browser.
@@ -64,7 +64,7 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ### Testing
 
-Run `ng test` to execute unit tests via Karma.
+Run `pnpm test` to execute unit tests via Jest.
 
 ## 📋 Development Plans
 
@@ -88,7 +88,7 @@ This project is distributed under the MIT license.
 **Приложение-таймер для техники Pomodoro (помидорной техники)**
 
 ![Версия](https://img.shields.io/badge/версия-0.1.0-blue)
-![Angular](https://img.shields.io/badge/Angular-18.2.10-red)
+![Angular](https://img.shields.io/badge/Angular-21.1.5-red)
 ![Лицензия](https://img.shields.io/badge/лицензия-MIT-green)
 
 ## 📋 О проекте
