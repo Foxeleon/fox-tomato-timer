@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 
 import { TimerComponent } from './timer.component';
 
@@ -8,7 +9,8 @@ describe('TimerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TimerComponent]
+      imports: [TimerComponent],
+      providers: [provideMockStore({})]
     })
     .compileComponents();
 

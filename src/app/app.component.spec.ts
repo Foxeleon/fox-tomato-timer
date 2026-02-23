@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { provideMockStore } from '@ngrx/store/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      imports: [AppComponent, NoopAnimationsModule],
+      providers: [provideMockStore({})]
     }).compileComponents();
   });
 
@@ -17,13 +20,13 @@ describe('AppComponent', () => {
   it(`should have the 'fox-tomato-timer' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('fox-tomato-timer');
+    expect(app.title).toEqual('Fox Tomato Timer');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, fox-tomato-timer');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Fox Tomato Timer');
   });
 });
