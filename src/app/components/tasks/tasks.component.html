@@ -1,35 +1,36 @@
 <div class="tasks-container">
   <h2>Tasks</h2>
   <div class="task-input">
-      <mat-form-field>
-        <input matInput
-               placeholder="New task"
-               [ngModel]="newTaskTitle$ | async"
-               (ngModelChange)="onTaskInputChange($event)"
-               (keyup.enter)="addTask()"
+    <mat-form-field>
+      <input matInput
+        placeholder="New task"
+        [ngModel]="newTaskTitle$ | async"
+        (ngModelChange)="onTaskInputChange($event)"
+        (keyup.enter)="addTask()"
         >
-    </mat-form-field>
-  </div>
-  <div cdkDropList
-       class="tasks-list"
-       (cdkDropListDropped)="drop($event)"
-       (cdkDropListSorted)="onDragMoved($event)">
-    <div class="task-item"
-         *ngFor="let task of tasks; let i = index"
-         cdkDrag
-         [@dragAnimation]="draggedDirection">
-      <div class="task-content">
-        <span class="task-title">{{ task.title }}</span>
-        <span class="task-duration">{{ task.elapsedTime === 0? 'Remaining time: ' + formatTime(this.remainingTime) : 'Elapsed time: ' + formatTime(task.elapsedTime) }}</span>
-        <div class="task-actions">
-          <button mat-icon-button (click)="editTask(task)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button (click)="deleteTask(task.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
+      </mat-form-field>
+    </div>
+    <div cdkDropList
+      class="tasks-list"
+      (cdkDropListDropped)="drop($event)"
+      (cdkDropListSorted)="onDragMoved($event)">
+      @for (task of tasks; track task; let i = $index) {
+        <div class="task-item"
+          cdkDrag
+          [@dragAnimation]="draggedDirection">
+          <div class="task-content">
+            <span class="task-title">{{ task.title }}</span>
+            <span class="task-duration">{{ task.elapsedTime === 0? 'Remaining time: ' + formatTime(this.remainingTime) : 'Elapsed time: ' + formatTime(task.elapsedTime) }}</span>
+            <div class="task-actions">
+              <button mat-icon-button (click)="editTask(task)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteTask(task.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
-</div>
