@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
 
-import { RouterOutlet } from '@angular/router';
 import { TimerComponent } from './components/timer/timer.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 
 @Component({
     selector: 'app-root',
     imports: [
-    RouterOutlet,
     TimerComponent,
     TasksComponent
 ],

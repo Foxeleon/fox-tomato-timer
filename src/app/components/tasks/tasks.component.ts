@@ -11,7 +11,6 @@ import { Observable, Subscription, take, tap } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
 import * as TasksActions from '../../store/actions/task.actions';
 import { selectNewTaskTitle } from '../../store/selectors/task.selectors';
-import { MatCheckbox } from '@angular/material/checkbox';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerService } from '../../shared/services/timer.service';
 import { animate, transition, trigger } from '@angular/animations';
@@ -25,8 +24,7 @@ import { animate, transition, trigger } from '@angular/animations';
         MatButtonModule,
         MatListModule,
         MatIconModule,
-        DragDropModule,
-        MatCheckbox
+        DragDropModule
     ],
     templateUrl: './tasks.component.html',
     styleUrl: './tasks.component.scss',

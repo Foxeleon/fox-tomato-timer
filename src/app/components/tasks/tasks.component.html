@@ -14,7 +14,7 @@
       class="tasks-list"
       (cdkDropListDropped)="drop($event)"
       (cdkDropListSorted)="onDragMoved($event)">
-      @for (task of tasks; track task; let i = $index) {
+      @for (task of tasks; track task; ) {
         <div class="task-item"
           cdkDrag
           [@dragAnimation]="draggedDirection">
