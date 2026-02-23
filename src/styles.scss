@@ -1,7 +1,8 @@
 @use '@angular/material' as mat;
 
 // Включаем базовые стили Material
-@include mat.core();
+@include mat.elevation-classes();
+@include mat.app-background();
 
 // Определяем тему в стиле Material 3
 $theme: mat.define-theme(
