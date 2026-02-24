@@ -6,9 +6,9 @@ import { TasksComponent } from './components/tasks/tasks.component';
 @Component({
     selector: 'app-root',
     imports: [
-    TimerComponent,
-    TasksComponent
-],
+      TimerComponent,
+      TasksComponent
+    ],
     template: `
     <div class="container mat-elevation-z2">
       <h1 class="mat-h1">{{ title }}</h1>

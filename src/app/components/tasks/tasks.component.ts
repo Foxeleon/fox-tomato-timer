@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { CdkDragDrop, CdkDragSortEvent, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription, take, tap } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
 import * as TasksActions from '../../store/actions/task.actions';
 import { selectNewTaskTitle } from '../../store/selectors/task.selectors';
