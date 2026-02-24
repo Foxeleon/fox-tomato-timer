@@ -1,38 +1,67 @@
 # FoxTomatoTimer
 
-**Pomodoro technique timer application**
+Pomodoro technique timer application.
 
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
-![Angular](https://img.shields.io/badge/Angular-18.2.10-red)
+![Angular](https://img.shields.io/badge/Angular-21.1.5-red)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-## 📋 About the Project
+## About
 
-FoxTomatoTimer is a productivity application based on the Pomodoro technique. The concept is simple: work with full concentration for a certain period of time, then take a short break. After several such cycles, take a longer break.
+FoxTomatoTimer is a productivity application based on the Pomodoro technique: work with full concentration for a fixed interval, then take a short break. After several cycles, take a longer break.
 
-## ✨ Features
+This repository is designed to evolve into a multi-platform product:
+- Web app
+- Telegram mini-app
+- Chrome/Chromium extension
+- Android app (WebView/PWA-like runtime)
 
-- **⏱️ Customizable intervals** for work and rest
-- **📊 Productivity statistics** to analyze your work
-- **🔔 Notifications** about the beginning and end of intervals
-- **🧩 Intuitive interface** with a pleasant user experience
+A future backend is planned on AWS Serverless.
 
-## 🛠️ Technologies
+## Features (current & planned)
 
-- **TypeScript** (89.4%)
-- **HTML** (5.4%)
-- **SCSS** (5.2%)
-- **Angular** (version 18.2.10)
-- **NgRx** for application state management
+- Customizable work/rest intervals
+- Productivity statistics (analytics-first approach)
+- Notifications about interval start/end (platform-adapted)
+- Task management with categories
+- Multi-platform support roadmap (Web / Telegram / Extension / Android)
+- AWS Serverless backend integration (planned)
 
-## 🚀 Getting Started
+## Tech stack
+
+- Angular 21 (standalone bootstrap via `bootstrapApplication`)
+- NgRx (centralized store, domain-sliced inside `src/app/store`)
+- Angular Material / CDK
+- TypeScript
+- RxJS
+- Package manager: pnpm
+- Unit tests: Jest
+- E2E tests: Playwright (planned/being introduced)
+
+## Project architecture (high level)
+
+Key conventions used in this repo:
+
+- Standalone policy:
+  - The project does NOT use `standalone: true`.
+  - Convention: if a component/directive/pipe has `imports` in its decorator, it is treated as standalone.
+
+- Timer tick policy:
+  - High-frequency timer ticks must NOT be dispatched into NgRx every second.
+  - Timer ticks belong in a dedicated timer engine/service outside the store.
+  - NgRx stores discrete domain events and parameters (start/pause/resume/stop/reset, duration, outcomes).
+
+For the full rules and anti-pattern list, read:
+- `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`
+
+## Getting started
 
 ### Requirements
 
-- Node.js
-- npm or yarn
+- Node.js 20.20.0 (or compatible with the project's Angular version)
+- pnpm (use the version installed on your machine; keep `pnpm-lock.yaml` consistent)
 
-### Installation and Launch
+### Installation & run
 
 ```bash
 # Clone the repository
@@ -40,132 +69,184 @@ git clone https://github.com/Foxeleon/fox-tomato-timer.git
 cd fox-tomato-timer
 
 # Install dependencies
-npm install
+pnpm install
 
-# Run in development mode
-ng serve
+# Start dev server
+pnpm start
 ```
 
 Open `http://localhost:4200/` in your browser.
 
-## 🔍 Development
+## Development
 
-### Development server
+### Dev server
 
-Run `ng serve` for a development server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-### Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+pnpm start
+```
 
 ### Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+pnpm run build
+```
 
-### Testing
+Build artifacts will be stored in `dist/`.
 
-Run `ng test` to execute unit tests via Karma.
+### Unit tests (Jest)
 
-## 📋 Development Plans
+```bash
+pnpm test
+```
 
-- Browser extension for Chrome/Chromium
-- Web version with full functionality
-- Mobile applications for Android and iOS
-- Telegram integration (mini-app)
+### E2E tests (Playwright)
 
-## 📄 License
+E2E is planned/being introduced. Once configured, the command will be documented here (for example `pnpm e2e`).
 
-This project is distributed under the MIT license.
+## Contribution
 
-## 👨‍💻 Author
+- Use pnpm only (do not mix npm/yarn with pnpm in this repo).
+- Follow the architecture rules in `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`.
+- Use the PR checklist template in `.github/pull_request_template.md`.
 
-- [Foxeleon](https://github.com/Foxeleon)
+## Roadmap
+
+- Telegram mini-app integration
+- Chrome/Chromium extension
+- Android app runtime packaging
+- AWS Serverless backend (auth, storage, analytics pipeline)
+- Playwright E2E suite (smoke + regression scenarios)
+
+## License
+
+MIT
+
+## Author
+
+- Foxeleon — https://github.com/Foxeleon
 
 ---
 
-💡 **The Pomodoro Technique** was developed by Francesco Cirillo in the late 1980s and got its name from the tomato-shaped timer he used during his university studies.
+# FoxTomatoTimer (RU)
 
-**Приложение-таймер для техники Pomodoro (помидорной техники)**
+Таймер для техники Pomodoro (“помидорной техники”).
 
 ![Версия](https://img.shields.io/badge/версия-0.1.0-blue)
-![Angular](https://img.shields.io/badge/Angular-18.2.10-red)
+![Angular](https://img.shields.io/badge/Angular-21.1.5-red)
 ![Лицензия](https://img.shields.io/badge/лицензия-MIT-green)
 
-## 📋 О проекте
+## О проекте
 
-FoxTomatoTimer - это приложение для повышения продуктивности на основе техники Pomodoro. Концепция проста: работайте с полной концентрацией в течение определенного времени, затем делайте короткий перерыв. После нескольких таких циклов берите длительный перерыв.
+FoxTomatoTimer — приложение для повышения продуктивности на основе техники Pomodoro: работа с полной концентрацией заданное время, затем короткий перерыв. После нескольких циклов — длинный перерыв.
 
-## ✨ Особенности
+Репозиторий развивается в сторону мультиплатформенного продукта:
+- Web
+- Telegram mini-app
+- расширение Chrome/Chromium
+- Android (WebView/PWA-подобный рантайм)
 
-- **⏱️ Настраиваемые интервалы** для работы и отдыха
-- **📊 Статистика продуктивности** для анализа вашей работы
-- **🔔 Уведомления** о начале и окончании интервалов
-- **🧩 Интуитивный интерфейс** с приятным пользовательским опытом
+В перспективе планируется бекенд на AWS Serverless.
 
-## 🛠️ Технологии
+## Возможности (текущие и планируемые)
 
-- **TypeScript** (89.4%)
-- **HTML** (5.4%)
-- **SCSS** (5.2%)
-- **Angular** (версия 18.2.10)
-- **NgRx** для управления состоянием приложения
+- Настраиваемые интервалы работы/отдыха
+- Статистика продуктивности (подход “analytics-first”)
+- Уведомления о старте/конце интервалов (с учётом платформы)
+- Задачи и категории
+- Дорожная карта мультиплатформенности (Web / Telegram / Extension / Android)
+- Интеграция с AWS Serverless (план)
 
-## 🚀 Начало работы
+## Технологии
+
+- Angular 21 (standalone bootstrap через `bootstrapApplication`)
+- NgRx (централизованный store, доменные срезы внутри `src/app/store`)
+- Angular Material / CDK
+- TypeScript
+- RxJS
+- Менеджер пакетов: pnpm
+- Unit-тесты: Jest
+- E2E: Playwright (планируется/в процессе внедрения)
+
+## Архитектура (высокий уровень)
+
+Ключевые соглашения:
+
+- Standalone policy:
+  - В проекте НЕ используется `standalone: true`.
+  - Соглашение: если у компонента/директивы/пайпа есть `imports` в декораторе, он считается standalone.
+
+- Политика тиков таймера:
+  - Высокочастотные тики не диспатчатся в NgRx каждую секунду.
+  - Тики живут в отдельном timer engine/service вне store.
+  - NgRx хранит дискретные события и параметры (start/pause/resume/stop/reset, duration, итоги).
+
+Полные правила и анти-паттерны:
+- `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`
+
+## Быстрый старт
 
 ### Требования
 
-- Node.js
-- npm или yarn
+- Node.js 20.20.0 (или совместимая версия под Angular проекта)
+- pnpm (важно сохранять консистентность `pnpm-lock.yaml`)
 
 ### Установка и запуск
 
 ```bash
-# Клонирование репозитория
 git clone https://github.com/Foxeleon/fox-tomato-timer.git
 cd fox-tomato-timer
 
-# Установка зависимостей
-npm install
-
-# Запуск в режиме разработки
-ng serve
+pnpm install
+pnpm start
 ```
 
-Откройте `http://localhost:4200/` в вашем браузере.
+Открой `http://localhost:4200/` в браузере.
 
-## 🔍 Разработка
+## Разработка
 
-### Development server
+### Dev server
 
-Запустите `ng serve` для запуска сервера разработки. Перейдите на `http://localhost:4200/`. Приложение автоматически перезагрузится, если вы измените любой из исходных файлов.
-
-### Code scaffolding
-
-Запустите `ng generate component component-name` для создания нового компонента. Также можно использовать `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+pnpm start
+```
 
 ### Build
 
-Запустите `ng build` для сборки проекта. Артефакты сборки будут сохранены в директории `dist/`.
+```bash
+pnpm run build
+```
 
-### Тестирование
+Артефакты сборки будут в `dist/`.
 
-Запустите `ng test` для выполнения модульных тестов с помощью Karma.
+### Unit-тесты (Jest)
 
-## 📋 Планы развития
+```bash
+pnpm test
+```
 
-- Расширение для браузеров Chrome/Chromium
-- Веб-версия с полной функциональностью
-- Мобильные приложения для Android и iOS
-- Интеграция с Telegram (mini-app)
+### E2E (Playwright)
 
-## 📄 Лицензия
+E2E планируется/в процессе внедрения. После настройки команда будет описана здесь (например `pnpm e2e`).
 
-Этот проект распространяется под лицензией MIT.
+## Contribution
 
-## 👨‍💻 Автор
+- Использовать только pnpm (не смешивать npm/yarn с pnpm).
+- Следовать правилам в `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`.
+- Использовать чек-лист PR из `.github/pull_request_template.md`.
 
-- [Foxeleon](https://github.com/Foxeleon)
+## Планы развития
 
----
+- Telegram mini-app
+- расширение Chrome/Chromium
+- Android упаковка/рантайм
+- AWS Serverless бекенд (auth, storage, analytics)
+- Playwright E2E (smoke + regression)
 
-💡 **Метод Pomodoro** был разработан Франческо Чирилло в конце 1980-х и получил свое название от таймера в форме помидора, который он использовал во время учебы. 
+## Лицензия
+
+MIT
+
+## Автор
+
+- Foxeleon — https://github.com/Foxeleon
+```

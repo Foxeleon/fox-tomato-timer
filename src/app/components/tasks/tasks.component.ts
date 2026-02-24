@@ -5,40 +5,37 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { CdkDragDrop, CdkDragSortEvent, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragSortEvent, DragDropModule } from '@angular/cdk/drag-drop';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription, take, tap } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
 import * as TasksActions from '../../store/actions/task.actions';
 import { selectNewTaskTitle } from '../../store/selectors/task.selectors';
-import { MatCheckbox } from '@angular/material/checkbox';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerService } from '../../shared/services/timer.service';
 import { animate, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'app-tasks',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatInputModule,
-    MatButtonModule,
-    MatListModule,
-    MatIconModule,
-    DragDropModule,
-    MatCheckbox
-  ],
-  templateUrl: './tasks.component.html',
-  styleUrl: './tasks.component.scss',
-  animations: [
-    trigger('dragAnimation', [
-      transition('idle => draggingUp', animate('200ms ease-in-out')),
-      transition('idle => draggingDown', animate('200ms ease-in-out')),
-      transition('draggingUp => idle', animate('200ms ease-in')),
-      transition('draggingDown => idle', animate('200ms ease-in'))
-    ])
-  ]
+    selector: 'app-tasks',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatInputModule,
+        MatButtonModule,
+        MatListModule,
+        MatIconModule,
+        DragDropModule
+    ],
+    templateUrl: './tasks.component.html',
+    styleUrl: './tasks.component.scss',
+    animations: [
+        trigger('dragAnimation', [
+            transition('idle => draggingUp', animate('200ms ease-in-out')),
+            transition('idle => draggingDown', animate('200ms ease-in-out')),
+            transition('draggingUp => idle', animate('200ms ease-in')),
+            transition('draggingDown => idle', animate('200ms ease-in'))
+        ])
+    ]
 })
 export class TasksComponent implements OnInit, OnDestroy {
   tasks$: Observable<Task[]>;
