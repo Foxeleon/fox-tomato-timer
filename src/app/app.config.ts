@@ -1,4 +1,8 @@
-import { ApplicationConfig, isDevMode, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  isDevMode,
+  provideZonelessChangeDetection
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -10,17 +14,18 @@ import { TimerEffects } from './store/effects/timer.effects';
 import { TaskEffects } from './store/effects/task.effects';
 import { provideHttpClient } from '@angular/common/http';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideZonelessChangeDetection(),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideAnimations(),
-    provideStore({ timer: timerReducer, tasks: taskReducer }),
-    provideEffects([TimerEffects, TaskEffects]),
+    provideStore({
+      timer: timerReducer,
+      tasks: taskReducer,
+    }),
+    provideEffects(TimerEffects, TaskEffects),
     provideHttpClient(),
     provideStoreDevtools({
       maxAge: 25,
@@ -28,17 +33,10 @@ export const appConfig: ApplicationConfig = {
       autoPause: true,
       trace: false,
       traceLimit: 75,
-      connectInZone: true,
-      serialize: {
-        options: {
-          undefined: true,
-          function: false,
-        },
-      },
     }),
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
-      useValue: { appearance: 'outline' }
-    }
-  ]
+      useValue: { appearance: 'outline' },
+    },
+  ],
 };
