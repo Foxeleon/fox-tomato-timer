@@ -20,6 +20,21 @@ export default tseslint.config(
     rules: {
       // Enforce OnPush change detection strategy for Zoneless Angular
       '@angular-eslint/prefer-on-push-component-change-detection': 'error',
+
+      // Explicitly enforce modern DI (inject) over constructors (from .windsurfrules)
+      '@angular-eslint/prefer-inject': 'error',
+
+      // Forbid empty lifecycle methods
+      '@angular-eslint/no-empty-lifecycle-method': 'error',
+
+      // Quality of Life: allow unused variables if they start with an underscore
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }
+      ],
     },
   },
   {
