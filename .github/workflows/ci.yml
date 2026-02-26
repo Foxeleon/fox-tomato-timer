@@ -21,6 +21,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Enable Corepack BEFORE setup-node so pnpm is available for caching
+      - name: Enable Corepack
+        run: corepack enable
+
       # Setup Node.js with pnpm cache
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,12 +32,11 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
-      # Enable Corepack and activate pnpm from package.json "packageManager"
-      - name: Enable Corepack
+      # Diagnostics to confirm node and pnpm versions
+      - name: Diagnostics
         run: |
-          corepack enable
-          pnpm --version
           node --version
+          pnpm --version
 
       # Install dependencies with frozen lockfile
       - name: Install dependencies
