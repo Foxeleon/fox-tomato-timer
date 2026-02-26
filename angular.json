@@ -85,6 +85,14 @@
           "builder": "@angular-builders/jest:run",
           "options": {
             "tsConfig": "tsconfig.spec.json"
+          },
+          "configurations": {
+            "ci": {
+              "watch": false,
+              "ci": true,
+              "runInBand": true,
+              "coverage": true
+            }
           }
         },
         "lint": {
