@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+echo -e "${CYAN}🚀 Running pre-commit checks (formatting & linting)...${NC}"
+
+# Run lint-staged with pnpm to check and format staged files before commit
+if pnpm exec lint-staged; then
+  echo -e "${GREEN}✅ Pre-commit checks passed!${NC}"
+else
+  echo -e "${RED}❌ Linting failed. Please fix the errors above.${NC}"
+  exit 1
+fi

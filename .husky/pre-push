@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+echo -e "${CYAN}🚧 Running pre-push checks (tests & build)...${NC}"
+
+# Run tests
+if ! pnpm run test; then
+  echo -e "${RED}❌ Tests failed. Please fix the errors before pushing.${NC}"
+  exit 1
+fi
+
+# Run build
+if ! pnpm run build --configuration production; then
+  echo -e "${RED}❌ Build failed. Please fix the errors before pushing.${NC}"
+  exit 1
+fi
+
+echo -e "${GREEN}✅ All pre-push checks passed! Uploading...${NC}"
