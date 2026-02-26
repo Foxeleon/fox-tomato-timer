@@ -7,6 +7,13 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -16,9 +23,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Setup pnpm using version from package.json
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+      # Enable Corepack for deterministic pnpm version
+      - name: Enable Corepack
+        run: corepack enable
 
       # Setup Node.js 22 with pnpm cache
       - name: Setup Node.js
