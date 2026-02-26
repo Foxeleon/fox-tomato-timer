@@ -1,11 +1,10 @@
 name: CI Pipeline
 
-# Triggers for push and pull requests
 on:
   push:
-    branches: [main, develop]
+    branches: [master, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [master, develop]
 
 permissions:
   contents: read
@@ -17,22 +16,24 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-
     steps:
       # Checkout repository code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Enable Corepack for deterministic pnpm version
-      - name: Enable Corepack
-        run: corepack enable
-
-      # Setup Node.js 22 with pnpm cache
+      # Setup Node.js with pnpm cache
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'pnpm'
+
+      # Enable Corepack and activate pnpm from package.json "packageManager"
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          pnpm --version
+          node --version
 
       # Install dependencies with frozen lockfile
       - name: Install dependencies
@@ -48,4 +49,6 @@ jobs:
 
       # Build application in production mode
       - name: Build application
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: pnpm run build --configuration production
