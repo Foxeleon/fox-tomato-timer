@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ActiveTask, Task } from '../interfaces/task.interface';
 import * as TasksActions from '../../store/actions/task.actions';
 import * as TimerActions from '../../store/actions/timer.actions';
@@ -18,7 +18,9 @@ export class TaskService {
   activeTask$: Observable<ActiveTask | null>;
   activeTask: ActiveTask | null;
 
-  constructor(private store: Store) {
+  private store = inject(Store);
+
+  constructor() {
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
     this.activeTask$ = this.store.select(selectActiveTask);
     this.activeTask = null;
