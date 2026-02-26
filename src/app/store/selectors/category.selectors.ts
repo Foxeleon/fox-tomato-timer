@@ -5,15 +5,15 @@ export const selectCategoryState = createFeatureSelector<CategoryState>('categor
 
 export const selectAllCategories = createSelector(
   selectCategoryState,
-  (state: CategoryState) => state.categories
+  (state: CategoryState) => state.categories,
 );
 
 export const selectCategoriesLoading = createSelector(
   selectCategoryState,
-  (state: CategoryState) => state.loading
+  (state: CategoryState) => state.loading,
 );
 
 export const selectCategoriesError = createSelector(
   selectCategoryState,
-  (state: CategoryState) => state.error
+  (state: CategoryState) => state.error,
 );

@@ -7,33 +7,28 @@ import { Task } from '../interfaces/task.interface';
 import { Category } from '../interfaces/category.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StatisticsService {
   constructor(
     private taskService: TaskService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
   ) {}
 
-  getTasksPerCategory(): Observable<{category: string, count: number}[]> {
-    return combineLatest([
-      this.taskService.getTasks(),
-      this.categoryService.getCategories()
-    ]).pipe(
+  getTasksPerCategory(): Observable<{ category: string; count: number }[]> {
+    return combineLatest([this.taskService.getTasks(), this.categoryService.getCategories()]).pipe(
       map(([tasks, categories]) => {
-        return categories.map(category => ({
+        return categories.map((category) => ({
           category: category.name,
-          count: tasks.filter(task => task.categoryId === category.id).length
+          count: tasks.filter((task) => task.categoryId === category.id).length,
         }));
-      })
+      }),
     );
   }
 
   getTotalCompletedTasks(): Observable<number> {
-    return this.taskService.getTasks().pipe(
-      map(tasks => tasks.filter(task => task.completed).length)
-    );
+    return this.taskService
+      .getTasks()
+      .pipe(map((tasks) => tasks.filter((task) => task.completed).length));
   }
-
-  // Добавьте здесь другие методы для сбора и обработки статистики
 }

@@ -12,9 +12,8 @@ describe('TasksComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TasksComponent, NoopAnimationsModule],
-      providers: [provideMockStore({ initialState: { tasks: initialState } })]
-    })
-    .compileComponents();
+      providers: [provideMockStore({ initialState: { tasks: initialState } })],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TasksComponent);
     component = fixture.componentInstance;

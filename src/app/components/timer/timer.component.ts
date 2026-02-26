@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import * as TimerActions from '../../store/actions/timer.actions';
@@ -11,34 +11,36 @@ import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { map } from 'rxjs/operators';
-import { selectIsActiveTaskPaused, selectIsTaskInputActive } from '../../store/selectors/task.selectors';
+import {
+  selectIsActiveTaskPaused,
+  selectIsTaskInputActive,
+} from '../../store/selectors/task.selectors';
 import { TaskService } from '../../shared/services/task.service';
 import { ActiveTask } from '../../shared/interfaces/task.interface';
 import { TimerService } from '../../shared/services/timer.service';
 
 @Component({
-    selector: 'app-timer',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        MatButtonModule,
-        MatInputModule,
-        MatFormFieldModule,
-        FormsModule,
-        MatIconModule,
-        ReactiveFormsModule,
-    ],
-    templateUrl: './timer.component.html',
-    styleUrls: ['./timer.component.scss'],
-    animations: [
-        trigger('rotateAnimation', [
-            state('play', style({ transform: 'rotate(0deg)' })),
-            state('pause', style({ transform: 'rotate(180deg)' })),
-            transition('play <=> pause', animate('300ms ease-in-out'))
-        ])
-    ]
+  selector: 'app-timer',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    FormsModule,
+    MatIconModule,
+    ReactiveFormsModule,
+  ],
+  templateUrl: './timer.component.html',
+  styleUrls: ['./timer.component.scss'],
+  animations: [
+    trigger('rotateAnimation', [
+      state('play', style({ transform: 'rotate(0deg)' })),
+      state('pause', style({ transform: 'rotate(180deg)' })),
+      transition('play <=> pause', animate('300ms ease-in-out')),
+    ]),
+  ],
 })
-
 export class TimerComponent implements OnDestroy {
   timerState$: Observable<TimerState>;
   duration$: Observable<number>;
@@ -54,8 +56,12 @@ export class TimerComponent implements OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private store: Store<{ timer: TimerState }>, private taskService: TaskService, private timerService: TimerService) {
-    this.timerState$ = this.store.select(state => state.timer);
+  private readonly store = inject(Store<{ timer: TimerState }>);
+  private readonly taskService = inject(TaskService);
+  private readonly timerService = inject(TimerService);
+
+  constructor() {
+    this.timerState$ = this.store.select((state) => state.timer);
     const isTaskInputActive$ = this.store.select(selectIsTaskInputActive);
     const isActiveTaskPaused$ = this.store.select(selectIsActiveTaskPaused);
     this.isRunning$ = this.timerService.getIsRunningObservable();
@@ -63,35 +69,47 @@ export class TimerComponent implements OnDestroy {
     this.isPlayButtonEnabled$ = combineLatest([
       this.isRunning$,
       isTaskInputActive$,
-      isActiveTaskPaused$
+      isActiveTaskPaused$,
     ]).pipe(
-      map(([isRunning, isTaskInputActive, isActiveTaskPaused]) =>
-        isRunning || isTaskInputActive || isActiveTaskPaused
-      )
+      map(
+        ([isRunning, isTaskInputActive, isActiveTaskPaused]) =>
+          isRunning || isTaskInputActive || isActiveTaskPaused,
+      ),
     );
 
     this.activeTask = this.taskService.getActiveTask();
-    this.subscriptions.add(this.taskService.getActiveTaskObservable().subscribe(task => this.activeTask = task));
+    this.subscriptions.add(
+      this.taskService.getActiveTaskObservable().subscribe((task) => (this.activeTask = task)),
+    );
 
     this.remainingTime = this.timerService.getRemainingTime();
-    this.formattedRemainingTime = this.timerService.formatTime(timerService.getRemainingTime());
-    this.subscriptions.add(this.timerService.getRemainingTimeObservable().subscribe(remainingTime => this.formattedRemainingTime = this.timerService.formatTime(remainingTime)));
+    this.formattedRemainingTime = this.timerService.formatTime(
+      this.timerService.getRemainingTime(),
+    );
+    this.subscriptions.add(
+      this.timerService
+        .getRemainingTimeObservable()
+        .subscribe(
+          (remainingTime) =>
+            (this.formattedRemainingTime = this.timerService.formatTime(remainingTime)),
+        ),
+    );
 
     this.duration = this.timerService.getDuration();
     this.duration$ = this.timerService.getDurationObservable();
-    this.duration$.subscribe(duration => this.duration = duration);
+    this.duration$.subscribe((duration) => (this.duration = duration));
 
-    this.subscriptions.add(this.isRunning$.subscribe(isRunning => this.isRunning = isRunning));
+    this.subscriptions.add(this.isRunning$.subscribe((isRunning) => (this.isRunning = isRunning)));
     this.durationInput = this.timerService.formatTime(this.duration);
 
     this.durationInputControl = new FormControl(this.timerService.formatTime(this.duration), {
       validators: [Validators.required, Validators.pattern(/^([0-9][0-9]):([0-5][0-9])$/)],
-      updateOn: 'blur'
+      updateOn: 'blur',
     });
 
-    this.durationInputControl.valueChanges.subscribe(durationInput => {
+    this.durationInputControl.valueChanges.subscribe((durationInput) => {
       if (this.durationInputControl.valid) {
-        this.changeDurationInput(durationInput)
+        this.changeDurationInput(durationInput);
       }
     });
   }
@@ -127,7 +145,7 @@ export class TimerComponent implements OnDestroy {
 
   changeDurationInput(durationInput: string): void {
     const [minutes, seconds] = durationInput.split(':').map(Number);
-    this.store.dispatch(TimerActions.setDuration({ duration: ((minutes * 60) + seconds) * 1000 }));
+    this.store.dispatch(TimerActions.setDuration({ duration: (minutes * 60 + seconds) * 1000 }));
   }
 
   ngOnDestroy(): void {

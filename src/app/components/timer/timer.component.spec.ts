@@ -11,9 +11,8 @@ describe('TimerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TimerComponent],
-      providers: [provideMockStore({ initialState: { tasks: initialState } })]
-    })
-    .compileComponents();
+      providers: [provideMockStore({ initialState: { tasks: initialState } })],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TimerComponent);
     component = fixture.componentInstance;

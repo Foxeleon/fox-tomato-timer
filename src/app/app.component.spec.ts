@@ -8,7 +8,7 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent, NoopAnimationsModule],
-      providers: [provideMockStore({ initialState: { tasks: initialState } })]
+      providers: [provideMockStore({ initialState: { tasks: initialState } })],
     }).compileComponents();
   });
 

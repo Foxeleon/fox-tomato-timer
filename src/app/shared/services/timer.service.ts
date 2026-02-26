@@ -4,15 +4,19 @@ import { map, takeWhile, takeUntil, tap } from 'rxjs/operators';
 import * as TimerActions from '../../store/actions/timer.actions';
 import * as TasksActions from '../../store/actions/task.actions';
 import { Store } from '@ngrx/store';
-import { selectDuration, selectIsRunning, selectRemainingTime } from '../../store/selectors/timer.selectors';
+import {
+  selectDuration,
+  selectIsRunning,
+  selectRemainingTime,
+} from '../../store/selectors/timer.selectors';
 import { TaskService } from './task.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TimerService {
   private timerSubject = new BehaviorSubject<number>(0);
-  private currentDuration: number = 0;
+  private currentDuration = 0;
   private pauseSubject = new Subject<void>();
   private timerObservable: Observable<number> | null = null;
 
@@ -25,15 +29,18 @@ export class TimerService {
   remainingTime$: Observable<number>;
   remainingTime: number = 25 * 60 * 1000; // Default 25 minutes in ms
 
-  constructor(private store: Store, private taskService: TaskService) {
+  constructor(
+    private store: Store,
+    private taskService: TaskService,
+  ) {
     this.isRunning$ = this.store.select(selectIsRunning);
-    this.isRunning$.subscribe(isRunning => this.isRunning = isRunning);
+    this.isRunning$.subscribe((isRunning) => (this.isRunning = isRunning));
 
     this.duration$ = this.store.select(selectDuration);
-    this.duration$.subscribe(duration => this.duration = duration);
+    this.duration$.subscribe((duration) => (this.duration = duration));
 
     this.remainingTime$ = this.store.select(selectRemainingTime);
-    this.remainingTime$.subscribe(duration => this.remainingTime = duration);
+    this.remainingTime$.subscribe((duration) => (this.remainingTime = duration));
   }
 
   startTimer(duration?: number): Observable<number> {
@@ -50,12 +57,12 @@ export class TimerService {
       this.timerSubject.next(startValue);
 
       this.timerObservable = interval(1000).pipe(
-        map(tick => startValue - tick*1000 - 1000), // Subtract 1 to account for the immediate emission
-        takeWhile(remainingTime => remainingTime >= 0),
+        map((tick) => startValue - tick * 1000 - 1000), // Subtract 1 to account for the immediate emission
+        takeWhile((remainingTime) => remainingTime >= 0),
         takeUntil(this.pauseSubject),
-        tap(remainingTime => this.timerSubject.next(remainingTime)),
+        tap((remainingTime) => this.timerSubject.next(remainingTime)),
         // Start with the initial value
-        startWith(startValue)
+        startWith(startValue),
       );
     }
 
@@ -81,9 +88,9 @@ export class TimerService {
         ...activeTask,
         state: 'pending' as 'pending' | 'completed' | 'active' | 'paused',
         startTime,
-        elapsedTime: activeTask.elapsedTime + (Date.now() - startTime)
+        elapsedTime: activeTask.elapsedTime + (Date.now() - startTime),
       };
-      this.store.dispatch(TasksActions.stopTask({activeTask: stopActiveTask}));
+      this.store.dispatch(TasksActions.stopTask({ activeTask: stopActiveTask }));
     }
   }
 
@@ -91,8 +98,9 @@ export class TimerService {
     // Reset the timer to the current duration
     this.timerSubject.next(this.currentDuration);
 
-      // Start a new timer with the current duration
-      if (this.isRunning) this.store.dispatch(TimerActions.startTimer({ duration: this.currentDuration }));
+    // Start a new timer with the current duration
+    if (this.isRunning)
+      this.store.dispatch(TimerActions.startTimer({ duration: this.currentDuration }));
   }
 
   getDurationObservable(): Observable<number> {
@@ -102,7 +110,6 @@ export class TimerService {
   getDuration(): number {
     return this.duration;
   }
-
 
   getRemainingTimeObservable(): Observable<number> {
     return this.remainingTime$;

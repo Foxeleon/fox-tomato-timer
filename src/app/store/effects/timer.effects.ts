@@ -10,51 +10,54 @@ export class TimerEffects {
   startTimer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TimerActions.startTimer),
-      mergeMap(action =>
+      mergeMap((action) =>
         this.timerService.startTimer(action.duration).pipe(
-          map(remainingTime => TimerActions.tickTimer({ remainingTime })),
-          takeUntil(this.actions$.pipe(ofType(TimerActions.stopTimer, TimerActions.resetTimer)))
-        )
-      )
-    )
+          map((remainingTime) => TimerActions.tickTimer({ remainingTime })),
+          takeUntil(this.actions$.pipe(ofType(TimerActions.stopTimer, TimerActions.resetTimer))),
+        ),
+      ),
+    ),
   );
 
-  pauseTimer$ = createEffect(() =>
+  pauseTimer$ = createEffect(
+    () =>
       this.actions$.pipe(
         ofType(TimerActions.pauseTimer),
-        tap(() => this.timerService.pauseTimer())
+        tap(() => this.timerService.pauseTimer()),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
-  stopTimer$ = createEffect(() =>
+  stopTimer$ = createEffect(
+    () =>
       this.actions$.pipe(
         ofType(TimerActions.stopTimer),
-        tap(() => this.timerService.stopTimer())
+        tap(() => this.timerService.stopTimer()),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   resetTimer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TimerActions.resetTimer),
-      switchMap(action => {
+      switchMap((action) => {
         this.timerService.resetTimer();
         return [TimerActions.tickTimer({ remainingTime: action.duration })];
-      })
-    )
+      }),
+    ),
   );
 
-  setDuration$ = createEffect(() =>
+  setDuration$ = createEffect(
+    () =>
       this.actions$.pipe(
         ofType(TimerActions.setDuration),
-        tap(action => this.timerService.setDuration(action.duration))
+        tap((action) => this.timerService.setDuration(action.duration)),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   constructor(
     private actions$: Actions,
-    private timerService: TimerService
+    private timerService: TimerService,
   ) {}
 }
