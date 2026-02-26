@@ -1,11 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import * as TaskActions from '../actions/task.actions';
-import { map } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { Actions } from '@ngrx/effects';
 
 @Injectable()
 export class TaskEffects {
-  constructor(private actions$: Actions) {}
+  private actions$ = inject(Actions);
 
   // Add your task effects here
 }

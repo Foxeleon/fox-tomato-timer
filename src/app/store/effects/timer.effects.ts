@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as TimerActions from '../actions/timer.actions';
 import { TimerService } from '../../shared/services/timer.service';
@@ -7,6 +7,9 @@ import { tap } from 'rxjs';
 
 @Injectable()
 export class TimerEffects {
+  private actions$ = inject(Actions);
+  private timerService = inject(TimerService);
+
   startTimer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TimerActions.startTimer),
@@ -55,9 +58,4 @@ export class TimerEffects {
       ),
     { dispatch: false },
   );
-
-  constructor(
-    private actions$: Actions,
-    private timerService: TimerService,
-  ) {}
 }

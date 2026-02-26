@@ -1,11 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import * as CategoryActions from '../actions/category.actions';
-import { map } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { Actions } from '@ngrx/effects';
 
 @Injectable()
 export class CategoryEffects {
-  constructor(private actions$: Actions) {}
+  private actions$ = inject(Actions);
 
   // Add your category effects here
 }
