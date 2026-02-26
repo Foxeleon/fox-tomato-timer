@@ -1,0 +1,46 @@
+name: CI Pipeline
+
+# Triggers for push and pull requests
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # Setup pnpm using version from package.json
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ vars.packageManager || 'latest' }}
+      
+      # Setup Node.js 22 with pnpm cache
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      
+      # Install dependencies with frozen lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      # Run linting checks
+      - name: Lint code
+        run: pnpm run lint
+      
+      # Run tests with Jest for CI environment
+      - name: Run tests
+        run: pnpm test -- --runInBand --ci
+      
+      # Build application in production mode
+      - name: Build application
+        run: pnpm run build --configuration production
