@@ -48,7 +48,7 @@ jobs:
 
       # Run tests with Jest for CI environment
       - name: Run tests
-        run: pnpm test -- --runInBand --ci
+        run: pnpm run test:ci
 
       # Build application in production mode
       - name: Build application
