@@ -3,11 +3,11 @@ import { provideRouter, withComponentInputBinding, withViewTransitions } from '@
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideStore } from '@ngrx/store';
-import { taskReducer } from './store/reducers/task.reducer';
-import { timerReducer } from './store/reducers/timer.reducer';
+import { taskReducer } from './store/tasks/task.reducer';
+import { timerReducer } from './store/timer/timer.reducer';
 import { provideEffects } from '@ngrx/effects';
-import { TimerEffects } from './store/effects/timer.effects';
-import { TaskEffects } from './store/effects/task.effects';
+import { TimerEffects } from './store/timer/timer.effects';
+import { TaskEffects } from './store/tasks/task.effects';
 import { provideHttpClient } from '@angular/common/http';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideStoreDevtools } from '@ngrx/store-devtools';

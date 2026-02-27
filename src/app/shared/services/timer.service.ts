@@ -1,14 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, interval, BehaviorSubject, Subject, startWith } from 'rxjs';
 import { map, takeWhile, takeUntil, tap } from 'rxjs/operators';
-import * as TimerActions from '../../store/actions/timer.actions';
-import * as TasksActions from '../../store/actions/task.actions';
+import * as TimerActions from '../../store/timer/timer.actions';
+import * as TasksActions from '../../store/tasks/task.actions';
 import { Store } from '@ngrx/store';
 import {
   selectDuration,
   selectIsRunning,
   selectRemainingTime,
-} from '../../store/selectors/timer.selectors';
+} from '../../store/timer/timer.selectors';
 import { TaskService } from './task.service';
 
 @Injectable({

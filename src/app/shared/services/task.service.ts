@@ -1,14 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ActiveTask, Task } from '../interfaces/task.interface';
-import * as TasksActions from '../../store/actions/task.actions';
-import * as TimerActions from '../../store/actions/timer.actions';
+import * as TasksActions from '../../store/tasks/task.actions';
+import * as TimerActions from '../../store/timer/timer.actions';
 import { Store } from '@ngrx/store';
 import {
   selectActiveTask,
   selectAllTasks,
   selectNewTaskTitle,
-} from '../../store/selectors/task.selectors';
+} from '../../store/tasks/task.selectors';
 
 @Injectable({
   providedIn: 'root',

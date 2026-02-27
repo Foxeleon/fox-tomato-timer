@@ -1,5 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { TimerState } from '../reducers/timer.reducer';
+import { TimerState } from './timer.reducer';
 
 export const selectTimerState = createFeatureSelector<TimerState>('timer');
 

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideMockStore } from '@ngrx/store/testing';
 
 import { TimerComponent } from './timer.component';
-import { initialState } from '../../store/reducers/task.reducer';
+import { initialState } from '../../store/tasks/task.reducer';
 
 describe('TimerComponent', () => {
   let component: TimerComponent;

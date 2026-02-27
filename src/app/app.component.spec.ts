@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { provideMockStore } from '@ngrx/store/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { initialState } from './store/reducers/task.reducer';
+import { initialState } from './store/tasks/task.reducer';
 import { provideRouter } from '@angular/router';
 
 describe('AppComponent', () => {

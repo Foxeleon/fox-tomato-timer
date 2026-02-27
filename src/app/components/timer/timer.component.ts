@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
-import * as TimerActions from '../../store/actions/timer.actions';
-import { TimerState } from '../../store/reducers/timer.reducer';
+import * as TimerActions from '../../store/timer/timer.actions';
+import { TimerState } from '../../store/timer/timer.reducer';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
 import {
   selectIsActiveTaskPaused,
   selectIsTaskInputActive,
-} from '../../store/selectors/task.selectors';
+} from '../../store/tasks/task.selectors';
 import { TaskService } from '../../shared/services/task.service';
 import { ActiveTask } from '../../shared/interfaces/task.interface';
 import { TimerService } from '../../shared/services/timer.service';

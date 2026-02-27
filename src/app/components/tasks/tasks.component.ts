@@ -9,8 +9,8 @@ import { CdkDragDrop, CdkDragSortEvent, DragDropModule } from '@angular/cdk/drag
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
-import * as TasksActions from '../../store/actions/task.actions';
-import { selectNewTaskTitle } from '../../store/selectors/task.selectors';
+import * as TasksActions from '../../store/tasks/task.actions';
+import { selectNewTaskTitle } from '../../store/tasks/task.selectors';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerService } from '../../shared/services/timer.service';
 import { animate, transition, trigger } from '@angular/animations';

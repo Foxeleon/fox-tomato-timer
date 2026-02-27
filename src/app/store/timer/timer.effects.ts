@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import * as TimerActions from '../actions/timer.actions';
+import * as TimerActions from './timer.actions';
 import { TimerService } from '../../shared/services/timer.service';
 import { map, mergeMap, takeUntil, switchMap } from 'rxjs/operators';
 import { tap } from 'rxjs';

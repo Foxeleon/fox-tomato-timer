@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import * as TaskActions from '../actions/task.actions';
+import * as TaskActions from './task.actions';
 import { ActiveTask, Task } from '../../shared/interfaces/task.interface';
 
 export interface TaskState {
