@@ -4,11 +4,9 @@ import { map, takeWhile, takeUntil, tap } from 'rxjs/operators';
 import * as TimerActions from '../../store/timer/timer.actions';
 import * as TasksActions from '../../store/tasks/task.actions';
 import { Store } from '@ngrx/store';
-import {
-  selectDuration,
-  selectIsRunning,
-  selectRemainingTime,
-} from '../../store/timer/timer.selectors';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { selectDuration, selectIsRunning } from '../../store/timer/timer.selectors';
+import { TimerStore } from '../../components/timer/domain/timer.store';
 import { TaskService } from './task.service';
 
 @Injectable({
@@ -31,6 +29,7 @@ export class TimerService {
 
   private store = inject(Store);
   private taskService = inject(TaskService);
+  private timerStore = inject(TimerStore);
 
   constructor() {
     this.isRunning$ = this.store.select(selectIsRunning);
@@ -39,8 +38,8 @@ export class TimerService {
     this.duration$ = this.store.select(selectDuration);
     this.duration$.subscribe((duration) => (this.duration = duration));
 
-    this.remainingTime$ = this.store.select(selectRemainingTime);
-    this.remainingTime$.subscribe((duration) => (this.remainingTime = duration));
+    this.remainingTime$ = toObservable(this.timerStore.remainingMs);
+    this.remainingTime$.subscribe((remainingTime) => (this.remainingTime = remainingTime));
   }
 
   startTimer(duration?: number): Observable<number> {

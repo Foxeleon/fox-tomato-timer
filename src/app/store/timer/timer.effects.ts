@@ -1,32 +1,28 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as TimerActions from './timer.actions';
-import { TimerService } from '../../shared/services/timer.service';
-import { map, mergeMap, takeUntil, switchMap } from 'rxjs/operators';
+import { TimerStore } from '../../components/timer/domain/timer.store';
 import { tap } from 'rxjs';
 
 @Injectable()
 export class TimerEffects {
-  private actions$ = inject(Actions);
-  private timerService = inject(TimerService);
+  private readonly actions$ = inject(Actions);
+  private readonly timerStore = inject(TimerStore);
 
-  startTimer$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(TimerActions.startTimer),
-      mergeMap((action) =>
-        this.timerService.startTimer(action.duration).pipe(
-          map((remainingTime) => TimerActions.tickTimer({ remainingTime })),
-          takeUntil(this.actions$.pipe(ofType(TimerActions.stopTimer, TimerActions.resetTimer))),
-        ),
+  startTimer$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(TimerActions.startTimer),
+        tap((action) => this.timerStore.start(action.duration)),
       ),
-    ),
+    { dispatch: false },
   );
 
   pauseTimer$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(TimerActions.pauseTimer),
-        tap(() => this.timerService.pauseTimer()),
+        tap(() => this.timerStore.pause()),
       ),
     { dispatch: false },
   );
@@ -35,26 +31,16 @@ export class TimerEffects {
     () =>
       this.actions$.pipe(
         ofType(TimerActions.stopTimer),
-        tap(() => this.timerService.stopTimer()),
+        tap(() => this.timerStore.reset()),
       ),
     { dispatch: false },
   );
 
-  resetTimer$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(TimerActions.resetTimer),
-      switchMap((action) => {
-        this.timerService.resetTimer();
-        return [TimerActions.tickTimer({ remainingTime: action.duration })];
-      }),
-    ),
-  );
-
-  setDuration$ = createEffect(
+  resetTimer$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(TimerActions.setDuration),
-        tap((action) => this.timerService.setDuration(action.duration)),
+        ofType(TimerActions.resetTimer),
+        tap((action) => this.timerStore.reset(action.duration)),
       ),
     { dispatch: false },
   );

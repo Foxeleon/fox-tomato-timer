@@ -8,11 +8,6 @@ export const selectIsRunning = createSelector(
   (state: TimerState) => state.isRunning,
 );
 
-export const selectRemainingTime = createSelector(
-  selectTimerState,
-  (state: TimerState) => state.remainingTime,
-);
-
 export const selectDuration = createSelector(
   selectTimerState,
   (state: TimerState) => state.duration,

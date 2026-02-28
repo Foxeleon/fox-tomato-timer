@@ -1,31 +1,34 @@
-@if (timerState$ | async; as timerState) {
-  <div class="timer">
-    <h2 class="mat-display-4">{{ this.formattedRemainingTime }}</h2>
-    <div class="controls">
-      <button
-        mat-fab
-        color="primary"
-        (click)="toggleTimer()"
-        [disabled]="(isPlayButtonEnabled$ | async) === false"
-        [@rotateAnimation]="timerState.isRunning ? 'pause' : 'play'"
-      >
-        <mat-icon>{{ timerState.isRunning ? 'pause' : 'play_arrow' }}</mat-icon>
-      </button>
-      <button mat-fab color="warn" (click)="stopTimer()">
-        <mat-icon>stop</mat-icon>
-      </button>
-      <button mat-fab color="warn" (click)="resetTimer()">
-        <mat-icon>replay</mat-icon>
-      </button>
-    </div>
-    <mat-form-field>
-      <input matInput [formControl]="durationInputControl" placeholder="Duration (mm:ss)" />
-      @if (durationInputControl.invalid && durationInputControl.errors?.['required']) {
-        <mat-error> Duration is required. </mat-error>
-      }
-      @if (durationInputControl.invalid && durationInputControl.errors?.['pattern']) {
-        <mat-error> Duration must be in the format mm:ss. (max 99:59) </mat-error>
-      }
-    </mat-form-field>
+<div class="timer">
+  <h2 class="mat-display-4">{{ timerStore.remainingMs() | date: 'mm:ss' : 'UTC' }}</h2>
+  <div class="controls">
+    <button
+      mat-fab
+      color="primary"
+      (click)="toggleTimer()"
+      [disabled]="!isPlayButtonEnabled()"
+      [@rotateAnimation]="timerStore.status() === 'running' ? 'pause' : 'play'"
+    >
+      <mat-icon>{{ timerStore.status() === 'running' ? 'pause' : 'play_arrow' }}</mat-icon>
+    </button>
+    <button mat-fab color="warn" (click)="stopTimer()">
+      <mat-icon>stop</mat-icon>
+    </button>
+    <button mat-fab color="warn" (click)="resetTimer()">
+      <mat-icon>replay</mat-icon>
+    </button>
   </div>
-}
+  <mat-form-field>
+    <input
+      matInput
+      [formControl]="durationInputControl"
+      placeholder="Duration (mm:ss)"
+      (blur)="onDurationBlur()"
+    />
+    @if (durationInputControl.invalid && durationInputControl.errors?.['required']) {
+      <mat-error> Duration is required. </mat-error>
+    }
+    @if (durationInputControl.invalid && durationInputControl.errors?.['pattern']) {
+      <mat-error> Duration must be in the format mm:ss. (max 99:59) </mat-error>
+    }
+  </mat-form-field>
+</div>

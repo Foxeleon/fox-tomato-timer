@@ -11,8 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
     <mat-toolbar color="primary">
       <span class="title">{{ title }}</span>
       <span class="spacer"></span>
-      <a mat-button routerLink="/timer" routerLinkActive="mat-mdc-button-active">Timer</a>
-      <a mat-button routerLink="/tasks" routerLinkActive="mat-mdc-button-active">Tasks</a>
+      <a mat-button routerLink="/dashboard" routerLinkActive="mat-mdc-button-active">Dashboard</a>
       <a mat-button routerLink="/statistics" routerLinkActive="mat-mdc-button-active">Statistics</a>
       <a mat-button routerLink="/categories" routerLinkActive="mat-mdc-button-active">Categories</a>
     </mat-toolbar>
