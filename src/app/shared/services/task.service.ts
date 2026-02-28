@@ -1,24 +1,30 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ActiveTask, Task } from '../interfaces/task.interface';
-import * as TasksActions from '../../store/actions/task.actions';
-import * as TimerActions from '../../store/actions/timer.actions';
+import * as TasksActions from '../../store/tasks/task.actions';
+import * as TimerActions from '../../store/timer/timer.actions';
 import { Store } from '@ngrx/store';
-import { selectActiveTask, selectAllTasks, selectNewTaskTitle } from '../../store/selectors/task.selectors';
+import {
+  selectActiveTask,
+  selectAllTasks,
+  selectNewTaskTitle,
+} from '../../store/tasks/task.selectors';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TaskService {
   newTaskTitle$: Observable<string>;
   activeTask$: Observable<ActiveTask | null>;
   activeTask: ActiveTask | null;
 
-  constructor(private store: Store) {
+  private store = inject(Store);
+
+  constructor() {
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
     this.activeTask$ = this.store.select(selectActiveTask);
-    this.activeTask = null
-    this.activeTask$.subscribe(task => this.activeTask = task);
+    this.activeTask = null;
+    this.activeTask$.subscribe((task) => (this.activeTask = task));
   }
 
   getActiveTaskObservable(): Observable<ActiveTask | null> {
@@ -47,30 +53,32 @@ export class TaskService {
   }
 
   addTask(duration: number) {
-    this.newTaskTitle$.subscribe(title => {
-      if (title.trim()) {
-        const newTask: Task = {
-          id: Date.now().toString(),
-          title: title.trim(),
-          state: 'active',
-          duration: duration,
-          elapsedTime: 0,
-          order: 0
-        };
-        this.store.dispatch(TasksActions.addTask({ task: newTask }));
-        if (this.activeTask === null) {
-          this.setActiveTask(newTask.id);
-          this.store.dispatch(TimerActions.startTimer({ duration: newTask.duration }));
+    this.newTaskTitle$
+      .subscribe((title) => {
+        if (title.trim()) {
+          const newTask: Task = {
+            id: Date.now().toString(),
+            title: title.trim(),
+            state: 'active',
+            duration: duration,
+            elapsedTime: 0,
+            order: 0,
+          };
+          this.store.dispatch(TasksActions.addTask({ task: newTask }));
+          if (this.activeTask === null) {
+            this.setActiveTask(newTask.id);
+            this.store.dispatch(TimerActions.startTimer({ duration: newTask.duration }));
+          }
+          // reset state of input field
+          this.store.dispatch(TasksActions.setNewTaskTitle({ title: '' }));
+          this.store.dispatch(TasksActions.setTaskInputActive({ isActive: false }));
         }
-        // reset state of input field
-        this.store.dispatch(TasksActions.setNewTaskTitle({ title: '' }));
-        this.store.dispatch(TasksActions.setTaskInputActive({ isActive: false }));
-      }
-    }).unsubscribe();
+      })
+      .unsubscribe();
   }
 
   updateWholeTask(updatedTask: Task): void {
-    this.store.dispatch(TasksActions.updateTask({task: updatedTask}));
+    this.store.dispatch(TasksActions.updateTask({ task: updatedTask }));
   }
 
   deleteTask(taskId: string): void {

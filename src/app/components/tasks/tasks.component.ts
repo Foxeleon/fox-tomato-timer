@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -9,33 +9,34 @@ import { CdkDragDrop, CdkDragSortEvent, DragDropModule } from '@angular/cdk/drag
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { Task } from '../../shared/interfaces/task.interface';
-import * as TasksActions from '../../store/actions/task.actions';
-import { selectNewTaskTitle } from '../../store/selectors/task.selectors';
+import * as TasksActions from '../../store/tasks/task.actions';
+import { selectNewTaskTitle } from '../../store/tasks/task.selectors';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerService } from '../../shared/services/timer.service';
 import { animate, transition, trigger } from '@angular/animations';
 
 @Component({
-    selector: 'app-tasks',
-    imports: [
-        CommonModule,
-        FormsModule,
-        MatInputModule,
-        MatButtonModule,
-        MatListModule,
-        MatIconModule,
-        DragDropModule
-    ],
-    templateUrl: './tasks.component.html',
-    styleUrl: './tasks.component.scss',
-    animations: [
-        trigger('dragAnimation', [
-            transition('idle => draggingUp', animate('200ms ease-in-out')),
-            transition('idle => draggingDown', animate('200ms ease-in-out')),
-            transition('draggingUp => idle', animate('200ms ease-in')),
-            transition('draggingDown => idle', animate('200ms ease-in'))
-        ])
-    ]
+  selector: 'app-tasks',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatInputModule,
+    MatButtonModule,
+    MatListModule,
+    MatIconModule,
+    DragDropModule,
+  ],
+  templateUrl: './tasks.component.html',
+  styleUrl: './tasks.component.scss',
+  animations: [
+    trigger('dragAnimation', [
+      transition('idle => draggingUp', animate('200ms ease-in-out')),
+      transition('idle => draggingDown', animate('200ms ease-in-out')),
+      transition('draggingUp => idle', animate('200ms ease-in')),
+      transition('draggingDown => idle', animate('200ms ease-in')),
+    ]),
+  ],
 })
 export class TasksComponent implements OnInit, OnDestroy {
   tasks$: Observable<Task[]>;
@@ -48,20 +49,28 @@ export class TasksComponent implements OnInit, OnDestroy {
   remainingTime: number; // Значение по умолчанию (25 минут)
   private readonly subscriptions: Subscription = new Subscription();
 
-  constructor(private store: Store, private taskService: TaskService, private timerService: TimerService) {
+  private readonly store = inject(Store);
+  private readonly taskService = inject(TaskService);
+  private readonly timerService = inject(TimerService);
+
+  constructor() {
     this.tasks$ = this.taskService.getTasks();
-    this.tasks$.subscribe(tasks => this.tasks = tasks);
+    this.tasks$.subscribe((tasks) => (this.tasks = tasks));
     this.activeTask$ = this.taskService.getActiveTaskObservable();
     this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
 
     this.duration = this.timerService.getDuration();
     this.remainingTime = this.timerService.getRemainingTime();
-    this.subscriptions.add(this.timerService.getDurationObservable().subscribe(duration => {
-      this.duration = duration;
-    }));
-    this.subscriptions.add(this.timerService.getRemainingTimeObservable().subscribe(remainingTime => {
-      this.remainingTime = remainingTime;
-    }));
+    this.subscriptions.add(
+      this.timerService.getDurationObservable().subscribe((duration) => {
+        this.duration = duration;
+      }),
+    );
+    this.subscriptions.add(
+      this.timerService.getRemainingTimeObservable().subscribe((remainingTime) => {
+        this.remainingTime = remainingTime;
+      }),
+    );
   }
 
   ngOnInit() {
@@ -80,7 +89,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   addTask() {
-    if(!this.taskService.getActiveTask()) this.taskService.addTask(this.duration);
+    if (!this.taskService.getActiveTask()) this.taskService.addTask(this.duration);
   }
 
   drop(event: CdkDragDrop<Task[]>) {
@@ -113,9 +122,8 @@ export class TasksComponent implements OnInit, OnDestroy {
   completeTask(task: Task) {
     if (task.state === 'active') {
       this.store.dispatch(TasksActions.completeActiveTask());
-    } else
-    if (task.state !== 'completed') {
-      this.taskService.patchTask(task.id, {state: 'completed'});
+    } else if (task.state !== 'completed') {
+      this.taskService.patchTask(task.id, { state: 'completed' });
     }
   }
 
@@ -139,5 +147,4 @@ export class TasksComponent implements OnInit, OnDestroy {
   formatTime(duration: number): string {
     return this.timerService.formatTime(duration);
   }
-
 }

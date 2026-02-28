@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Category } from '../interfaces/category.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CategoryService {
   private categories: Category[] = [];
@@ -19,7 +19,7 @@ export class CategoryService {
   }
 
   updateCategory(updatedCategory: Category): void {
-    const index = this.categories.findIndex(category => category.id === updatedCategory.id);
+    const index = this.categories.findIndex((category) => category.id === updatedCategory.id);
     if (index !== -1) {
       this.categories[index] = updatedCategory;
       this.categoriesSubject.next([...this.categories]);
@@ -27,7 +27,7 @@ export class CategoryService {
   }
 
   deleteCategory(categoryId: string): void {
-    this.categories = this.categories.filter(category => category.id !== categoryId);
+    this.categories = this.categories.filter((category) => category.id !== categoryId);
     this.categoriesSubject.next([...this.categories]);
   }
 }

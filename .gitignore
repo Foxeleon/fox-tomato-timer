@@ -1,42 +1,41 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
 # Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+dist/
+tmp/
+out-tsc/
+bazel-out/
 
 # Node
-/node_modules
+node_modules/
 npm-debug.log
 yarn-error.log
 
-# IDEs and editors
+# pnpm
+.pnpm-store/
+# pnpm-lock.yaml must NOT be ignored — it must be committed
+
+# Angular
+.angular/
+
+# Cache & Coverage
+.sass-cache/
+coverage/
+typings/
+
+# IDEs — JetBrains
 .idea/
+*.iml
 .project
 .classpath
-.c9/
-*.launch
 .settings/
-*.sublime-workspace
+.sublime-workspace/
 
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
+# IDEs — VS Code (keep shared settings)
+.vscode/
+# Uncomment lines below if you share VS Code settings with the team:
+# !.vscode/settings.json
+# !.vscode/tasks.json
+# !.vscode/extensions.json
 
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-
-# System files
+# OS
 .DS_Store
 Thumbs.db

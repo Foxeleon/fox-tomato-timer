@@ -1,10 +1,15 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .tasks-container {
   padding: 20px;
-  max-width: 600px; /* Сузим контейнер для улучшения читаемости */
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
   background-color: #ffffff; /* Белый фон для контейнера */
-  border-radius: 12px; /* Увеличим скругления */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Тень для улучшения визуальной структуры */
+  border-radius: 16px; /* Увеличим скругления, чтобы совпадало с таймером */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Тень, совпадающая с таймером */
 }
 
 .task-input {
@@ -22,7 +27,9 @@ mat-form-field {
   border-radius: 8px; /* Скруглённые углы */
   padding: 5px 12px; /* Внутренние отступы */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Лёгкая тень */
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 mat-form-field.mat-focused {
@@ -53,7 +60,9 @@ input[matInput]:focus::placeholder {
   border: 1px solid #ddd;
   border-radius: 6px;
   outline: none;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 
   &:focus {
     border-color: #4a90e2; /* Цвет рамки при фокусе */
@@ -93,7 +102,9 @@ input[matInput]:focus::placeholder {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: grab;
 
   &:last-child {
@@ -197,7 +208,9 @@ input[matInput]:focus::placeholder {
   color: #666;
   padding: 4px;
   border-radius: 4px;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 
   &:hover {
     color: #4a90e2; /* Акцентный цвет при наведении */

@@ -3,7 +3,7 @@ import { provideMockStore } from '@ngrx/store/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { TasksComponent } from './tasks.component';
-import { initialState } from '../../store/reducers/task.reducer';
+import { initialState } from '../../store/tasks/task.reducer';
 
 describe('TasksComponent', () => {
   let component: TasksComponent;
@@ -12,9 +12,8 @@ describe('TasksComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TasksComponent, NoopAnimationsModule],
-      providers: [provideMockStore({ initialState: { tasks: initialState } })]
-    })
-    .compileComponents();
+      providers: [provideMockStore({ initialState: { tasks: initialState } })],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TasksComponent);
     component = fixture.componentInstance;
