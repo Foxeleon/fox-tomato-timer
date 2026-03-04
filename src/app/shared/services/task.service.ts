@@ -1,79 +1,91 @@
 import { Injectable, inject } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Observable, take } from 'rxjs';
+import { ActiveTask, Task } from '../interfaces/task.interface';
 import * as TasksActions from '../../store/tasks/task.actions';
+import * as TimerActions from '../../store/timer/timer.actions';
+import { Store } from '@ngrx/store';
 import {
   selectActiveTask,
   selectAllTasks,
   selectNewTaskTitle,
 } from '../../store/tasks/task.selectors';
-import { Observable, take } from 'rxjs';
-import { ActiveTask, Task } from '../interfaces/task.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
+  newTaskTitle$: Observable<string>;
+  activeTask$: Observable<ActiveTask | null>;
+  activeTask: ActiveTask | null;
+
   private store = inject(Store);
 
-  // Facade methods for components - hide NgRx complexity
+  constructor() {
+    this.newTaskTitle$ = this.store.select(selectNewTaskTitle);
+    this.activeTask$ = this.store.select(selectActiveTask);
+    this.activeTask = null;
+    this.activeTask$.subscribe((task) => (this.activeTask = task));
+  }
+
+  getActiveTaskObservable(): Observable<ActiveTask | null> {
+    return this.activeTask$;
+  }
+
+  getActiveTask(): ActiveTask | null {
+    return this.activeTask;
+  }
+
+  completeActiveTask() {
+    this.store.dispatch(TasksActions.completeActiveTask());
+  }
+
+  setActiveTask(taskId: string) {
+    this.store.dispatch(TasksActions.setActiveTask({ taskId }));
+  }
+
+  patchTask(taskId: string, changes: Partial<Task | ActiveTask>) {
+    this.store.dispatch(TasksActions.patchTask({ taskId, changes }));
+  }
+
+  // TODO rewrite function with logic of ngrx store
   getTasks(): Observable<Task[]> {
     return this.store.select(selectAllTasks);
   }
 
-  getActiveTask(): Observable<ActiveTask | null> {
-    return this.store.select(selectActiveTask);
-  }
-
-  getNewTaskTitle(): Observable<string> {
-    return this.store.select(selectNewTaskTitle);
-  }
-
-  // Domain orchestration through facade
-  addTask(duration: number): void {
-    this.getNewTaskTitle()
+  addTask(duration: number) {
+    this.store
+      .select(selectNewTaskTitle)
       .pipe(take(1))
       .subscribe((title) => {
         if (title.trim()) {
+          const isActive = this.activeTask === null;
           const newTask: Task = {
             id: crypto.randomUUID(),
             title: title.trim(),
-            state: 'pending',
-            duration,
+            state: isActive ? 'active' : 'pending',
+            duration: duration,
             elapsedTime: 0,
             order: 0,
           };
-
           this.store.dispatch(TasksActions.addTask({ task: newTask }));
+
+          if (isActive) {
+            this.setActiveTask(newTask.id);
+            this.store.dispatch(TimerActions.startTimer({ duration: newTask.duration }));
+          }
+
+          // reset state of input field
           this.store.dispatch(TasksActions.setNewTaskTitle({ title: '' }));
           this.store.dispatch(TasksActions.setTaskInputActive({ isActive: false }));
         }
       });
   }
 
-  deleteTask(taskId: string): void {
-    // Infrastructure side effects only, without dispatch to prevent infinite loop
-    try {
-      console.log('Task deleted from storage:', taskId);
-      // localStorage/API logic here
-    } catch (error) {
-      console.error('Error deleting task from storage:', error);
-    }
-  }
-
-  // Other facade methods
-  completeActiveTask(): void {
-    this.store.dispatch(TasksActions.completeActiveTask());
-  }
-
-  setActiveTask(taskId: string): void {
-    this.store.dispatch(TasksActions.setActiveTask({ taskId }));
-  }
-
-  patchTask(taskId: string, changes: Partial<Task | ActiveTask>): void {
-    this.store.dispatch(TasksActions.patchTask({ taskId, changes }));
-  }
-
   updateWholeTask(updatedTask: Task): void {
     this.store.dispatch(TasksActions.updateTask({ task: updatedTask }));
+  }
+
+  deleteTask(taskId: string): void {
+    this.store.dispatch(TasksActions.deleteTask({ id: taskId }));
   }
 }

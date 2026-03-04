@@ -173,13 +173,7 @@ export class TasksComponent implements OnInit {
   }
 
   deleteTask(taskId: string) {
-    const isActive = this.activeTask()?.id === taskId;
-
-    this.store.dispatch(TasksActions.deleteTask({ id: taskId }));
-
-    if (isActive) {
-      this.timerStore.reset(this.timerStore.baseDurationMs());
-    }
+    this.taskService.deleteTask(taskId);
   }
 
   formatMsToMmSs(ms: number): string {
