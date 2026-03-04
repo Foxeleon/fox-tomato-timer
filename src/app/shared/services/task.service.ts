@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { ActiveTask, Task } from '../interfaces/task.interface';
 import * as TasksActions from '../../store/tasks/task.actions';
 import * as TimerActions from '../../store/timer/timer.actions';
@@ -53,28 +53,32 @@ export class TaskService {
   }
 
   addTask(duration: number) {
-    this.newTaskTitle$
+    this.store
+      .select(selectNewTaskTitle)
+      .pipe(take(1))
       .subscribe((title) => {
         if (title.trim()) {
+          const isActive = this.activeTask === null;
           const newTask: Task = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             title: title.trim(),
-            state: 'active',
+            state: isActive ? 'active' : 'pending',
             duration: duration,
             elapsedTime: 0,
             order: 0,
           };
           this.store.dispatch(TasksActions.addTask({ task: newTask }));
-          if (this.activeTask === null) {
+
+          if (isActive) {
             this.setActiveTask(newTask.id);
             this.store.dispatch(TimerActions.startTimer({ duration: newTask.duration }));
           }
+
           // reset state of input field
           this.store.dispatch(TasksActions.setNewTaskTitle({ title: '' }));
           this.store.dispatch(TasksActions.setTaskInputActive({ isActive: false }));
         }
-      })
-      .unsubscribe();
+      });
   }
 
   updateWholeTask(updatedTask: Task): void {

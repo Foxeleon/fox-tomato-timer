@@ -5,13 +5,15 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatIconModule } from '@angular/material/icon';
 import {
   selectIsActiveTaskPaused,
   selectIsTaskInputActive,
-} from '../../store/tasks/task.selectors';
+  selectActiveTask,
+  saveTaskProgress,
+} from '../../store/tasks';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerStore } from './domain/timer.store';
 
@@ -41,7 +43,9 @@ export class TimerComponent {
   private readonly store = inject(Store);
   private readonly taskService = inject(TaskService);
 
-  private readonly isTaskInputActive = toSignal(this.store.select(selectIsTaskInputActive), {
+  readonly activeTask = this.store.selectSignal(selectActiveTask);
+
+  protected readonly isTaskInputActive = toSignal(this.store.select(selectIsTaskInputActive), {
     initialValue: false,
   });
   private readonly isActiveTaskPaused = toSignal(this.store.select(selectIsActiveTaskPaused), {
@@ -52,15 +56,8 @@ export class TimerComponent {
     () =>
       this.timerStore.status() === 'running' ||
       this.isTaskInputActive() ||
-      this.isActiveTaskPaused(),
-  );
-
-  protected readonly durationInputControl = new FormControl(
-    this.formatTime(this.timerStore.remainingMs()),
-    {
-      validators: [Validators.required, Validators.pattern(/^([0-9][0-9]):([0-5][0-9])$/)],
-      updateOn: 'blur',
-    },
+      this.isActiveTaskPaused() ||
+      this.activeTask() !== null,
   );
 
   toggleTimer(): void {
@@ -74,31 +71,40 @@ export class TimerComponent {
   }
 
   startTimer(): void {
-    const activeTask = this.taskService.getActiveTask();
+    const activeTask = this.activeTask();
     if (activeTask === null) {
-      this.taskService.addTask(this.timerStore.remainingMs());
+      if (this.isTaskInputActive()) {
+        this.taskService.addTask(this.timerStore.baseDurationMs());
+      }
+      return;
     } else {
       this.taskService.setActiveTask(activeTask.id);
-      this.timerStore.start();
+      this.timerStore.start(activeTask.duration - activeTask.elapsedTime);
     }
   }
 
-  pauseTimer(): void {
+  stopTimer(): void {
+    const task = this.activeTask();
     this.timerStore.pause();
+    if (task) {
+      this.store.dispatch(
+        saveTaskProgress({
+          taskId: task.id,
+          elapsedTime: task.duration - this.timerStore.remainingMs(),
+        }),
+      );
+      this.store.dispatch({ type: '[Task] Clear Active Task' });
+    }
+    this.timerStore.reset(this.timerStore.baseDurationMs());
   }
 
   resetTimer(): void {
-    this.timerStore.reset();
-  }
-
-  stopTimer(): void {
-    this.timerStore.reset();
-  }
-
-  onDurationBlur(): void {
-    if (this.durationInputControl.valid && this.durationInputControl.value) {
-      const [minutes, seconds] = this.durationInputControl.value.split(':').map(Number);
-      this.timerStore.reset((minutes * 60 + seconds) * 1000);
+    const task = this.activeTask();
+    if (task) {
+      this.timerStore.resetTimeOnly(task.duration);
+      this.store.dispatch(saveTaskProgress({ taskId: task.id, elapsedTime: 0 }));
+    } else {
+      this.timerStore.resetTimeOnly(this.timerStore.baseDurationMs());
     }
   }
 

@@ -22,26 +22,32 @@ export const initialState: TaskState = {
 
 export const taskReducer = createReducer(
   initialState,
-  on(TaskActions.addTask, (state, { task }) => ({ ...state, tasks: [...state.tasks, task] })),
+  on(TaskActions.addTask, (state, { task }) => ({
+    ...state,
+    tasks: [...state.tasks, { ...task }],
+  })),
+
   on(TaskActions.updateTask, (state, { task }) => ({
     ...state,
-    tasks: state.tasks.map((t) => (t.id === task.id ? task : t)),
+    tasks: state.tasks.map((t) => (t.id === task.id ? { ...task } : t)),
   })),
+
   on(TaskActions.deleteTask, (state, { id }) => ({
     ...state,
     tasks: state.tasks.filter((task) => task.id !== id),
   })),
+
   on(TaskActions.stopTask, (state, { activeTask }) => ({
     ...state,
     activeTask: null,
-    tasks: state.tasks.map((t) => (t.id === activeTask.id ? activeTask : t)),
+    tasks: state.tasks.map((t) => (t.id === activeTask.id ? { ...activeTask } : t)),
   })),
+
   on(TaskActions.patchTask, (state, { taskId, changes }) => {
     const updatedTasks = state.tasks.map((task) =>
       task.id === taskId ? { ...task, ...changes } : task,
     );
 
-    // Обновляем activeTask, если он существует и совпадает с обновляемой задачей
     const updatedActiveTask =
       state.activeTask && state.activeTask.id === taskId
         ? { ...state.activeTask, ...changes }
@@ -54,7 +60,38 @@ export const taskReducer = createReducer(
     };
   }),
 
-  on(TaskActions.updateTaskOrder, (state, { tasks }) => ({ ...state, tasks })),
+  on(TaskActions.saveTaskProgress, (state, { taskId, elapsedTime, isCompleted }) => {
+    const updatedTasks = state.tasks.map((task) => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          elapsedTime,
+          state: isCompleted ? 'completed' : task.state,
+        };
+      }
+      return task;
+    });
+
+    const updatedActiveTask =
+      state.activeTask && state.activeTask.id === taskId
+        ? {
+            ...state.activeTask,
+            elapsedTime,
+            state: isCompleted ? 'completed' : state.activeTask.state,
+          }
+        : state.activeTask;
+
+    return {
+      ...state,
+      tasks: updatedTasks,
+      activeTask: isCompleted && updatedActiveTask?.id === taskId ? null : updatedActiveTask,
+    };
+  }),
+
+  on(TaskActions.updateTaskOrder, (state, { tasks }) => ({
+    ...state,
+    tasks: [...tasks],
+  })),
 
   on(TaskActions.setNewTaskTitle, (state, { title }) => ({
     ...state,
@@ -105,10 +142,24 @@ export const taskReducer = createReducer(
     };
   }),
 
+  on(TaskActions.clearActiveTask, (state) => {
+    if (!state.activeTask) return state;
+
+    return {
+      ...state,
+      activeTask: null,
+      tasks: state.tasks.map((t) =>
+        t.id === state.activeTask?.id
+          ? { ...t, state: t.state === 'active' ? 'pending' : t.state }
+          : t,
+      ),
+    };
+  }),
+
   on(TaskActions.loadTasks, (state) => ({ ...state, loading: true })),
-  on(TaskActions.loadTasksSuccess, (state, { tasks }) => ({ ...state, tasks, loading: false })),
-  on(TaskActions.deleteTask, (state, { id }) => ({
+  on(TaskActions.loadTasksSuccess, (state, { tasks }) => ({
     ...state,
-    tasks: state.tasks.filter((t) => t.id !== id),
+    tasks: [...tasks],
+    loading: false,
   })),
 );

@@ -3,24 +3,32 @@ import { provideRouter, withComponentInputBinding, withViewTransitions } from '@
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideStore } from '@ngrx/store';
-import { taskReducer } from './store/tasks/task.reducer';
-import { timerReducer } from './store/timer/timer.reducer';
 import { provideEffects } from '@ngrx/effects';
-import { TimerEffects } from './store/timer/timer.effects';
-import { TaskEffects } from './store/tasks/task.effects';
 import { provideHttpClient } from '@angular/common/http';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { BrowserPlatformAdapter, PLATFORM_ADAPTER } from './core/platform';
+import { debugMetaReducer } from './store/logger.metareducer';
+import { TimerState, TimerEffects, timerReducer } from './store/timer';
+import { TaskState, TaskEffects, taskReducer } from './store/tasks';
+
+export interface AppState {
+  timer: TimerState;
+  tasks: TaskState;
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideAnimationsAsync(),
-    provideStore({
-      timer: timerReducer,
-      tasks: taskReducer,
-    }),
+    provideStore(
+      {
+        timer: timerReducer,
+        tasks: taskReducer,
+      },
+      { metaReducers: [debugMetaReducer] },
+    ),
     provideEffects(TimerEffects, TaskEffects),
     provideHttpClient(),
     provideStoreDevtools({
@@ -33,6 +41,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: 'outline' },
+    },
+    {
+      provide: PLATFORM_ADAPTER,
+      useClass: BrowserPlatformAdapter,
     },
   ],
 };

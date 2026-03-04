@@ -8,6 +8,7 @@ export type TimerMode = 'pomodoro' | 'shortBreak' | 'longBreak';
 
 export interface TimerSignalState {
   remainingMs: number;
+  baseDurationMs: number;
   status: TimerStatus;
   mode: TimerMode;
 }
@@ -16,6 +17,7 @@ const DEFAULT_DURATION_MS = 25 * 60 * 1000;
 
 const initialState: TimerSignalState = {
   remainingMs: DEFAULT_DURATION_MS,
+  baseDurationMs: DEFAULT_DURATION_MS,
   status: 'idle',
   mode: 'pomodoro',
 };
@@ -27,7 +29,6 @@ export const TimerStore = signalStore(
     const globalStore = inject(Store);
 
     let intervalId: ReturnType<typeof setInterval> | null = null;
-    let baseDurationMs = DEFAULT_DURATION_MS;
 
     const clearTimer = (): void => {
       if (intervalId !== null) {
@@ -53,11 +54,24 @@ export const TimerStore = signalStore(
     };
 
     return {
+      setBaseDuration(ms: number): void {
+        if (ms > 0) {
+          if (store.status() === 'idle') {
+            patchState(store, { baseDurationMs: ms, remainingMs: ms });
+          } else {
+            patchState(store, { baseDurationMs: ms });
+          }
+        }
+      },
+
       start(durationMs?: number): void {
         clearTimer();
         if (durationMs !== undefined) {
-          baseDurationMs = durationMs;
-          patchState(store, { remainingMs: durationMs, status: 'running' });
+          patchState(store, {
+            baseDurationMs: durationMs,
+            remainingMs: durationMs,
+            status: 'running',
+          });
         } else {
           patchState(store, { status: 'running' });
         }
@@ -77,9 +91,16 @@ export const TimerStore = signalStore(
 
       reset(durationMs?: number): void {
         clearTimer();
-        const newDuration = durationMs ?? baseDurationMs;
-        baseDurationMs = newDuration;
-        patchState(store, { remainingMs: newDuration, status: 'idle' });
+        const newDuration = durationMs ?? store.baseDurationMs();
+        patchState(store, {
+          baseDurationMs: newDuration,
+          remainingMs: newDuration,
+          status: 'idle',
+        });
+      },
+
+      resetTimeOnly(durationMs: number): void {
+        patchState(store, { remainingMs: durationMs });
       },
 
       cleanup(): void {
