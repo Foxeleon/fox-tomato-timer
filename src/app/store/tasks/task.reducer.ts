@@ -32,9 +32,10 @@ export const taskReducer = createReducer(
     tasks: state.tasks.map((t) => (t.id === task.id ? { ...task } : t)),
   })),
 
-  on(TaskActions.deleteTask, (state, { id }) => ({
+  on(TaskActions.deleteTaskSuccess, (state, { id }) => ({
     ...state,
     tasks: state.tasks.filter((task) => task.id !== id),
+    activeTask: state.activeTask?.id === id ? null : state.activeTask,
   })),
 
   on(TaskActions.stopTask, (state, { activeTask }) => ({

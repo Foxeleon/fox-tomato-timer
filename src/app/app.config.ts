@@ -9,13 +9,8 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { BrowserPlatformAdapter, PLATFORM_ADAPTER } from './core/platform';
 import { debugMetaReducer } from './store/logger.metareducer';
-import { TimerState, TimerEffects, timerReducer } from './store/timer';
-import { TaskState, TaskEffects, taskReducer } from './store/tasks';
-
-export interface AppState {
-  timer: TimerState;
-  tasks: TaskState;
-}
+import { TimerEffects, timerReducer } from './store/timer';
+import { TaskEffects, taskReducer } from './store/tasks';
 
 export const appConfig: ApplicationConfig = {
   providers: [

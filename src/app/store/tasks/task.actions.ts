@@ -10,6 +10,10 @@ export const loadTasksSuccess = createAction(
 export const addTask = createAction('[Task] Add Task', props<{ task: Task }>());
 export const updateTask = createAction('[Task] Update Task', props<{ task: Task }>());
 export const deleteTask = createAction('[Task] Delete Task', props<{ id: string }>());
+export const deleteTaskSuccess = createAction(
+  '[Task] Delete Task Success',
+  props<{ id: string }>(),
+);
 export const stopTask = createAction('[Task] Stop Task', props<{ activeTask: ActiveTask }>());
 export const saveTaskProgress = createAction(
   '[Task] Save Progress',
