@@ -4,11 +4,7 @@ import { ActiveTask, Task } from '../interfaces/task.interface';
 import * as TasksActions from '../../store/tasks/task.actions';
 import * as TimerActions from '../../store/timer/timer.actions';
 import { Store } from '@ngrx/store';
-import {
-  selectActiveTask,
-  selectAllTasks,
-  selectNewTaskTitle,
-} from '../../store/tasks/task.selectors';
+import { selectActiveTask, selectAllTasks, selectNewTaskTitle } from '../../store/tasks';
 
 @Injectable({
   providedIn: 'root',
@@ -83,9 +79,5 @@ export class TaskService {
 
   updateWholeTask(updatedTask: Task): void {
     this.store.dispatch(TasksActions.updateTask({ task: updatedTask }));
-  }
-
-  deleteTask(taskId: string): void {
-    this.store.dispatch(TasksActions.deleteTask({ id: taskId }));
   }
 }

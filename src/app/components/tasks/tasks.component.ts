@@ -69,7 +69,9 @@ export class TasksComponent implements OnInit {
   onDurationBlur(): void {
     if (this.durationInputControl.valid && this.durationInputControl.value) {
       const [minutes, seconds] = this.durationInputControl.value.split(':').map(Number);
-      this.timerStore.setBaseDuration((minutes * 60 + seconds) * 1000);
+      const ms = (minutes * 60 + seconds) * 1000;
+      this.timerStore.setBaseDuration(ms);
+      this.durationInputControl.setValue(this.formatMsToMmSs(ms));
     }
   }
 
@@ -172,8 +174,27 @@ export class TasksComponent implements OnInit {
     }
   }
 
-  deleteTask(taskId: string) {
-    this.taskService.deleteTask(taskId);
+  deleteTask(taskId: string): void {
+    const isActive = this.activeTask()?.id === taskId;
+
+    // Dispatch NgRx action for task deletion
+    this.store.dispatch(TasksActions.deleteTask({ id: taskId }));
+
+    // CRITICAL FIX: Reset timer to input field duration if deleting active task
+    if (isActive) {
+      const inputDuration = this.durationInputControl.value
+        ? this.parseDurationString(this.durationInputControl.value)
+        : this.timerStore.baseDurationMs();
+      this.timerStore.reset(inputDuration);
+    }
+  }
+
+  private parseDurationString(durationStr: string): number {
+    if (!durationStr || typeof durationStr !== 'string') {
+      return this.timerStore.baseDurationMs();
+    }
+    const [minutes, seconds] = durationStr.split(':').map(Number);
+    return (minutes * 60 + seconds) * 1000;
   }
 
   formatMsToMmSs(ms: number): string {
