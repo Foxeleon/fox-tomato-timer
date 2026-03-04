@@ -1,6 +1,7 @@
 {
   "name": "fox-tomato-timer",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Modern Pomodoro productivity app with Angular 21 Zoneless architecture",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

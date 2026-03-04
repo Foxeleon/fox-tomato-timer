@@ -1,252 +1,217 @@
-# FoxTomatoTimer
+# 🎯 FoxTomatoTimer 1.0
 
-Pomodoro technique timer application.
+[![Angular 21.2.0](https://img.shields.io/badge/Angular-21.2.0-red?logo=angular)](https://angular.dev)
+[![NgRx](https://img.shields.io/badge/NgRx-blue?logo=ngrx)](https://ngrx.io)
+[![Zoneless](https://img.shields.io/badge/Zoneless-brightgreen)](https://angular.dev/guide/signals)
+[![CI/CD](https://img.shields.io/badge/CI--CD-GitHub%20Actions-brightgreen)](https://github.com/Foxeleon/fox-tomato-timer/actions)
+[![pnpm](https://img.shields.io/badge/pnpm-strict-orange?logo=pnpm)](https://pnpm.io)
 
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
-![Angular](https://img.shields.io/badge/Angular-21.1.5-red)
-![License](https://img.shields.io/badge/license-MIT-green)
-
-## About
-
-FoxTomatoTimer is a productivity application based on the Pomodoro technique: work with full concentration for a fixed interval, then take a short break. After several cycles, take a longer break.
-
-This repository is designed to evolve into a multi-platform product:
-- Web app
-- Telegram mini-app
-- Chrome/Chromium extension
-- Android app (WebView/PWA-like runtime)
-
-A future backend is planned on AWS Serverless.
-
-## Features (current & planned)
-
-- Customizable work/rest intervals
-- Productivity statistics (analytics-first approach)
-- Notifications about interval start/end (platform-adapted)
-- Task management with categories
-- Multi-platform support roadmap (Web / Telegram / Extension / Android)
-- AWS Serverless backend integration (planned)
-
-## Tech stack
-
-- Angular 21 (standalone bootstrap via `bootstrapApplication`)
-- NgRx (centralized store, domain-sliced inside `src/app/store`)
-- Angular Material / CDK
-- TypeScript
-- RxJS
-- Package manager: pnpm
-- Unit tests: Jest
-- E2E tests: Playwright (planned/being introduced)
-
-## Project architecture (high level)
-
-Key conventions used in this repo:
-
-- Standalone policy:
-  - The project does NOT use `standalone: true`.
-  - Convention: if a component/directive/pipe has `imports` in its decorator, it is treated as standalone.
-
-- Timer tick policy:
-  - High-frequency timer ticks must NOT be dispatched into NgRx every second.
-  - Timer ticks belong in a dedicated timer engine/service outside the store.
-  - NgRx stores discrete domain events and parameters (start/pause/resume/stop/reset, duration, outcomes).
-
-For the full rules and anti-pattern list, read:
-- `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`
-
-## Getting started
-
-### Requirements
-
-- Node.js 20.20.0 (or compatible with the project's Angular version)
-- pnpm (use the version installed on your machine; keep `pnpm-lock.yaml` consistent)
-
-### Installation & run
-
-```bash
-# Clone the repository
-git clone https://github.com/Foxeleon/fox-tomato-timer.git
-cd fox-tomato-timer
-
-# Install dependencies
-pnpm install
-
-# Start dev server
-pnpm start
-```
-
-Open `http://localhost:4200/` in your browser.
-
-## Development
-
-### Dev server
-
-```bash
-pnpm start
-```
-
-### Build
-
-```bash
-pnpm run build
-```
-
-Build artifacts will be stored in `dist/`.
-
-### Unit tests (Jest)
-
-```bash
-pnpm test
-```
-
-### E2E tests (Playwright)
-
-E2E is planned/being introduced. Once configured, the command will be documented here (for example `pnpm e2e`).
-
-## Contribution
-
-- Use pnpm only (do not mix npm/yarn with pnpm in this repo).
-- Follow the architecture rules in `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`.
-- Use the PR checklist template in `.github/pull_request_template.md`.
-
-## Roadmap
-
-- Telegram mini-app integration
-- Chrome/Chromium extension
-- Android app runtime packaging
-- AWS Serverless backend (auth, storage, analytics pipeline)
-- Playwright E2E suite (smoke + regression scenarios)
-
-## License
-
-MIT
-
-## Author
-
-- Foxeleon — https://github.com/Foxeleon
+A modern, scalable Pomodoro productivity app built with Angular 21.2.0 (Zoneless). Prepared for multi-platform integration (Web, Telegram Mini App, Browser Extension) and an AWS Serverless backend.
 
 ---
 
-# FoxTomatoTimer (RU)
+## 🛠️ Tech Stack & Infrastructure
 
-Таймер для техники Pomodoro (“помидорной техники”).
+| Category | Details |
+|---|---|
+| Core | Angular 21.2.0 (`provideZonelessChangeDetection` enabled, `zone.js` removed) |
+| UI | Angular Material / CDK |
+| State | Domain-Driven NgRx (global store for discrete domain events) + `@ngrx/signals` (SignalStore for high-frequency Timer Engine) |
+| Routing | Feature-based routing with lazy loading (e.g. `/timer`, `/tasks`) |
+| Quality | ESLint, Prettier, Husky (pre-commit), Jest, Playwright |
+| CI/CD | GitHub Actions pipeline (lint → tests → build) |
+| Dependencies | pnpm only; lockfile is required and treated as a build artifact |
 
-![Версия](https://img.shields.io/badge/версия-0.1.0-blue)
-![Angular](https://img.shields.io/badge/Angular-21.1.5-red)
-![Лицензия](https://img.shields.io/badge/лицензия-MIT-green)
+---
 
-## О проекте
+## 🚀 Architecture 2.0 Highlights
 
-FoxTomatoTimer — приложение для повышения продуктивности на основе техники Pomodoro: работа с полной концентрацией заданное время, затем короткий перерыв. После нескольких циклов — длинный перерыв.
+### ⚡ Zoneless performance, explicit reactivity
 
-Репозиторий развивается в сторону мультиплатформенного продукта:
-- Web
-- Telegram mini-app
-- расширение Chrome/Chromium
-- Android (WebView/PWA-подобный рантайм)
+FoxTomatoTimer 2.0 runs without `zone.js`. UI updates are driven by explicit signals and deliberate state transitions instead of implicit zone-driven change detection.
 
-В перспективе планируется бекенд на AWS Serverless.
+Key conventions:
+- `ChangeDetectionStrategy.OnPush` by default for components.
+- Signals are the primary reactivity primitive for new code.
+- RxJS is retained where it naturally models async streams (notably NgRx effects and integration flows).
 
-## Возможности (текущие и планируемые)
+### ⏱️ Timer Engine: ticks outside the global store
 
-- Настраиваемые интервалы работы/отдыха
-- Статистика продуктивности (подход “analytics-first”)
-- Уведомления о старте/конце интервалов (с учётом платформы)
-- Задачи и категории
-- Дорожная карта мультиплатформенности (Web / Telegram / Extension / Android)
-- Интеграция с AWS Serverless (план)
+High-frequency ticks must never flood the NgRx store. The Timer Engine is designed to update UI-facing signals at a high cadence while keeping the global store clean and audit-friendly.
 
-## Технологии
+Rules enforced by design:
+- No per-second `store.dispatch(...)`.
+- NgRx stores discrete events and durable session parameters only (start/pause/resume/stop/reset/completed, durations, outcomes).
+- Time computations are performed in a domain service/engine, not inside selectors.
 
-- Angular 21 (standalone bootstrap через `bootstrapApplication`)
-- NgRx (централизованный store, доменные срезы внутри `src/app/store`)
-- Angular Material / CDK
-- TypeScript
-- RxJS
-- Менеджер пакетов: pnpm
-- Unit-тесты: Jest
-- E2E: Playwright (планируется/в процессе внедрения)
+### 🧱 Domain-driven state boundaries
 
-## Архитектура (высокий уровень)
+The global store is domain-grouped (timer, tasks, statistics, categories) rather than organized by “technical type” folders. This keeps responsibilities explicit and prevents cross-feature coupling.
 
-Ключевые соглашения:
+Expected structure pattern:
+- `src/app/store/timer/*` (actions/reducer/selectors/effects + `index.ts`)
+- `src/app/store/tasks/*`
+- `src/app/store/statistics/*`
+- `src/app/store/categories/*`
 
-- Standalone policy:
-  - В проекте НЕ используется `standalone: true`.
-  - Соглашение: если у компонента/директивы/пайпа есть `imports` в декораторе, он считается standalone.
+Cross-domain interaction:
+- via NgRx actions/effects/facades
+- never via direct “feature service → another feature service” calls
 
-- Политика тиков таймера:
-  - Высокочастотные тики не диспатчатся в NgRx каждую секунду.
-  - Тики живут в отдельном timer engine/service вне store.
-  - NgRx хранит дискретные события и параметры (start/pause/resume/stop/reset, duration, итоги).
+### 🌐 Platform abstraction layer (multi-platform ready)
 
-Полные правила и анти-паттерны:
+Features must not call platform APIs directly (`window`, `document`, Telegram WebApp API, `chrome.*`). All platform-specific behavior goes through `core/platform` adapters (DI-injected interfaces).
+
+Why this matters:
+- keeps domains portable across runtimes (Web, Telegram Mini App, Browser Extension)
+- makes tests deterministic (platform behavior can be mocked without real Telegram/extension APIs)
+
+For the complete architecture rules and forbidden patterns:
 - `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`
 
-## Быстрый старт
+---
 
-### Требования
-
-- Node.js 20.20.0 (или совместимая версия под Angular проекта)
-- pnpm (важно сохранять консистентность `pnpm-lock.yaml`)
-
-### Установка и запуск
+## 🚀 Getting Started
 
 ```bash
 git clone https://github.com/Foxeleon/fox-tomato-timer.git
 cd fox-tomato-timer
-
-pnpm install
+pnpm install --frozen-lockfile
 pnpm start
 ```
 
-Открой `http://localhost:4200/` в браузере.
-
-## Разработка
-
-### Dev server
-
+Common commands:
 ```bash
-pnpm start
+pnpm run lint
+pnpm run test:ci   # or: pnpm test
+pnpm run build --configuration production
 ```
 
-### Build
+Notes:
+- pnpm is the only supported package manager for this repo.
+- CI expects reproducible installs (`--frozen-lockfile`).
 
-```bash
-pnpm run build
-```
+---
 
-Артефакты сборки будут в `dist/`.
+## 🧭 Roadmap / What’s Next
 
-### Unit-тесты (Jest)
+Planned / prepared work (non-exhaustive):
+- Implement a real Telegram Platform Adapter (currently mocked for local development and tests).
+- Define and connect AWS API Gateway contracts and Serverless backend integrations.
+- Expand Playwright E2E coverage for the feature-routed flows.
 
-```bash
-pnpm test
-```
+---
 
-### E2E (Playwright)
-
-E2E планируется/в процессе внедрения. После настройки команда будет описана здесь (например `pnpm e2e`).
-
-## Contribution
-
-- Использовать только pnpm (не смешивать npm/yarn с pnpm).
-- Следовать правилам в `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`.
-- Использовать чек-лист PR из `.github/pull_request_template.md`.
-
-## Планы развития
-
-- Telegram mini-app
-- расширение Chrome/Chromium
-- Android упаковка/рантайм
-- AWS Serverless бекенд (auth, storage, analytics)
-- Playwright E2E (smoke + regression)
-
-## Лицензия
+## 📄 License
 
 MIT
 
-## Автор
+---
 
-- Foxeleon — https://github.com/Foxeleon
+# 🎯 FoxTomatoTimer 1.0 (Русский)
+
+[![Angular 21.2.0](https://img.shields.io/badge/Angular-21.2.0-red?logo=angular)](https://angular.dev)
+[![NgRx](https://img.shields.io/badge/NgRx-blue?logo=ngrx)](https://ngrx.io)
+[![Zoneless](https://img.shields.io/badge/Zoneless-brightgreen)](https://angular.dev/guide/signals)
+[![CI/CD](https://img.shields.io/badge/CI--CD-GitHub%20Actions-brightgreen)](https://github.com/Foxeleon/fox-tomato-timer/actions)
+[![pnpm](https://img.shields.io/badge/pnpm-strict-orange?logo=pnpm)](https://pnpm.io)
+
+Современное, масштабируемое приложение для продуктивности по технике Pomodoro на Angular 21.2.0 (Zoneless). Подготовлено для мультиплатформенной интеграции (Web, Telegram Mini App, Browser Extension) и будущего бэкенда на AWS Serverless.
+
+---
+
+## 🛠️ Технологии и инфраструктура
+
+| Категория | Детали |
+|---|---|
+| Ядро | Angular 21.2.0 (`provideZonelessChangeDetection` включён, `zone.js` удалён) |
+| UI | Angular Material / CDK |
+| Состояние | Domain-Driven NgRx (глобальный store для дискретных доменных событий) + `@ngrx/signals` (SignalStore для высокочастотного Timer Engine) |
+| Роутинг | Feature-based routing с lazy loading (например `/timer`, `/tasks`) |
+| Качество | ESLint, Prettier, Husky (pre-commit), Jest, Playwright |
+| CI/CD | пайплайн GitHub Actions (lint → tests → build) |
+| Зависимости | только pnpm; lockfile обязателен для воспроизводимости |
+
+---
+
+## 🚀 Архитектура 2.0 — ключевые идеи
+
+### ⚡ Zoneless: явная реактивность и предсказуемый рендеринг
+
+FoxTomatoTimer 2.0 работает без `zone.js`. Обновления UI происходят через явные сигналы и осмысленные переходы состояния, а не через неявные “побочные” триггеры.
+
+Ключевые конвенции:
+- `ChangeDetectionStrategy.OnPush` по умолчанию.
+- Signals — основной примитив реактивности для нового кода.
+- RxJS остаётся там, где он уместен (в первую очередь NgRx effects и интеграционные потоки).
+
+### ⏱️ Timer Engine: тики вне глобального store
+
+Высокочастотные тики таймера не должны “засорять” NgRx store. Timer Engine обновляет UI-сигналы часто, а глобальный store хранит только дискретные события и долговременные параметры сессии.
+
+Правила, которые считаются обязательными:
+- никаких `store.dispatch(...)` каждую секунду
+- NgRx хранит дискретные события и параметры (start/pause/resume/stop/reset/completed, длительности, результаты)
+- временные вычисления живут в доменном engine/сервисе, а не в селекторах
+
+### 🧱 Domain-Driven границы состояния
+
+Глобальный store организован по доменам (timer, tasks, statistics, categories), а не по “техническим типам”. Это упрощает поддержку, закрепляет ответственность и уменьшает связанность.
+
+Ожидаемый паттерн структуры:
+- `src/app/store/timer/*` (actions/reducer/selectors/effects + `index.ts`)
+- `src/app/store/tasks/*`
+- `src/app/store/statistics/*`
+- `src/app/store/categories/*`
+
+Междоменное взаимодействие:
+- через NgRx actions/effects/facades
+- не через прямые вызовы сервисов между фичами
+
+### 🌐 Платформенная абстракция (готовность к мультиплатформе)
+
+Прямые вызовы платформенных API (`window`, `document`, Telegram WebApp API, `chrome.*`) запрещены в фичах и эффектах. Любая платформенная логика должна идти через адаптеры `core/platform` (интерфейсы + DI).
+
+Зачем это нужно:
+- переносимость доменов между окружениями (Web, Telegram Mini App, Browser Extension)
+- детерминированные тесты (моки вместо реальных внешних систем)
+
+Полные правила архитектуры и список анти-паттернов:
+- `docs/architecture/ARCHITECTURE_AND_CODE_STYLE.md`
+
+---
+
+## 🚀 Быстрый старт
+
+```bash
+git clone https://github.com/Foxeleon/fox-tomato-timer.git
+cd fox-tomato-timer
+pnpm install --frozen-lockfile
+pnpm start
 ```
+
+Частые команды:
+```bash
+pnpm run lint
+pnpm run test:ci   # или: pnpm test
+pnpm run build --configuration production
+```
+
+Заметки:
+- в репозитории поддерживается только pnpm
+- CI ожидает воспроизводимую установку (`--frozen-lockfile`)
+
+---
+
+## 🧭 Roadmap / Что дальше
+
+Запланировано / подготовлено (не исчерпывающий список):
+- Реализовать “боевой” Telegram Platform Adapter (сейчас используется мок для локальной разработки и тестов).
+- Определить и подключить контракты AWS API Gateway и Serverless бэкенд-интеграции.
+- Расширить покрытие Playwright E2E для feature-роутинга.
+
+---
+
+## 📄 Лицензия
+
+MIT
