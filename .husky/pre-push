@@ -1,6 +1,6 @@
 #!/bin/sh
-cd "$(dirname "$0")/../.." || exit 1
-export PATH="./node_modules/.bin:$PATH"
+. "$(dirname -- "$0")/_/husky.sh"
+
 echo "🚧 Running pre-push checks (tests & build)..."
 
 if pnpm run test:ci && pnpm run build --configuration production; then
