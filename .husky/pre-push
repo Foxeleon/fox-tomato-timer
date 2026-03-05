@@ -1,5 +1,5 @@
 #!/bin/sh
-. "$(dirname -- "$0")/_/husky.sh"
+pnpm run test:ci && pnpm run build --configuration production
 
 echo "🚧 Running pre-push checks (tests & build)..."
 
