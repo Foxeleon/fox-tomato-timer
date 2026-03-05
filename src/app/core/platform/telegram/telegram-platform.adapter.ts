@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PlatformAdapter } from '../platform.interface';
 
-// 1. Описываем минимальный интерфейс того, что нам нужно от Telegram WebApp
 interface TelegramWebApp {
   initData: string;
   showAlert: (message: string) => void;
@@ -12,7 +11,6 @@ interface TelegramWebApp {
 
 @Injectable()
 export class TelegramPlatformAdapter implements PlatformAdapter {
-  // 2. Указываем правильный тип при кастинге объекта window
   private readonly webApp = (window as unknown as { Telegram?: { WebApp?: TelegramWebApp } })
     .Telegram?.WebApp;
 
