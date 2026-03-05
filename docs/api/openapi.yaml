@@ -1,0 +1,147 @@
+openapi: 3.0.3
+info:
+  title: Fox Tomato Timer API
+  description: Serverless REST API for Fox Tomato Timer
+  version: 1.0.0
+paths:
+  /sessions:
+    post:
+      summary: Create a new timer session
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Session'
+      responses:
+        '201':
+          description: Session created
+    get:
+      summary: Get user sessions
+      operationId: getSessions
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+  /statistics:
+    get:
+      summary: Get user statistics
+      operationId: getStatistics
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+  /tasks:
+    post:
+      summary: Create a new task
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '201':
+          description: Task created
+  /tasks/{id}:
+    patch:
+      summary: Update a task
+      operationId: updateTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: Task updated
+
+components:
+  schemas:
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+        duration:
+          type: number
+        mode:
+          type: string
+          enum: [pomodoro, shortBreak, longBreak]
+        taskId:
+          type: string
+      required:
+        - id
+        - userId
+        - startedAt
+        - duration
+        - mode
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        status:
+          type: string
+          enum: [todo, in_progress, done]
+        categoryId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - status
+        - createdAt
+
+    Statistics:
+      type: object
+      properties:
+        totalPomodoros:
+          type: number
+        totalMinutes:
+          type: number
+        streakDays:
+          type: number
+      required:
+        - totalPomodoros
+        - totalMinutes
+        - streakDays

@@ -1,22 +1,25 @@
-import { Component } from '@angular/core';
-
-import { TimerComponent } from './components/timer/timer.component';
-import { TasksComponent } from './components/tasks/tasks.component';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-    selector: 'app-root',
-    imports: [
-      TimerComponent,
-      TasksComponent
-    ],
-    template: `
+  selector: 'app-root',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterModule, MatToolbarModule, MatButtonModule],
+  template: `
+    <mat-toolbar color="primary">
+      <span class="title">{{ title }}</span>
+      <span class="spacer"></span>
+      <a mat-button routerLink="/dashboard" routerLinkActive="mat-mdc-button-active">Dashboard</a>
+      <a mat-button routerLink="/statistics" routerLinkActive="mat-mdc-button-active">Statistics</a>
+      <a mat-button routerLink="/categories" routerLinkActive="mat-mdc-button-active">Categories</a>
+    </mat-toolbar>
     <div class="container mat-elevation-z2">
-      <h1 class="mat-h1">{{ title }}</h1>
-      <app-timer></app-timer>
-      <app-tasks></app-tasks>
+      <router-outlet></router-outlet>
     </div>
   `,
-    styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   title = 'Fox Tomato Timer';

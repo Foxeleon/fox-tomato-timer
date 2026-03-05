@@ -23,10 +23,10 @@ Goals:
 - no “double sources of truth”
 - readiness for platform integrations (Telegram/extension/android)
 - testable logic (unit) and regressions (e2e)
+- modern Angular standards (Zoneless change detection, Signals)
 
 Non-goals:
-- immediate refactoring of the current codebase
-- making zoneless mandatory (may be a separate initiative)
+- mixing backend logic into the frontend repository
 
 ## 1) Architectural principles (invariants)
 
@@ -151,7 +151,7 @@ Critical rule:
 - no `store.dispatch(...)` on every second.
 
 Target model:
-- a timer engine (domain service) exposes `remainingMs$` and status.
+- a timer engine (domain service) exposes `remainingMs` and `status` as Angular Signals.
 - the store keeps status and parameters (start/pause timestamps, duration, outcomes).
 - on interval completion, a single discrete “completed” event is emitted.
 
@@ -223,25 +223,33 @@ Stability rule:
 
 ## 10) Dependency management (pnpm)
 
-Rules:
-- single package manager: pnpm
-- CI uses `pnpm install --frozen-lockfile`
-- mixing npm/yarn with pnpm in the same repo is forbidden
+**Core Rules:**
+- Single package manager: `pnpm`.
+- Mixing `npm`/`yarn` with `pnpm` in the same repository is strictly forbidden.
 
-Dependency updates:
-- only via a dedicated PR
-- after updates, required checks: build, unit, e2e smoke
+**Workflow (Local vs. CI):**
+- **Local Development:** You may modify `package.json` manually or use `pnpm add <package>`. Always run `pnpm install` afterwards to resolve dependencies and generate the updated `pnpm-lock.yaml`. Both files must be committed atomically.
+- **CI/CD Pipeline:** The CI pipeline MUST use `pnpm install --frozen-lockfile`. This ensures the build is strictly reproducible and will fail immediately if the lockfile is out of sync with `package.json`.
+
+**Dependency Updates:**
+- Must be done via a dedicated PR (no silent updates in feature branches).
+- After any updates, the following checks are mandatory: build, unit tests, e2e smoke tests.
 
 ## 11) Code style: baseline rules
 
 Components:
 - thin components: UI + minimal glue logic
 - `ChangeDetectionStrategy.OnPush` by default
-- minimize subscriptions in constructors
+- aim for <= 3 injected dependencies; if > 3, justify or introduce a facade
+- prefer `inject()` over constructor injection
+- prefer signal-based APIs: `input()`, `output()`, `computed()`
 
-RxJS:
+RxJS & Signals:
+- Angular Signals are the primary reactivity primitive (`signal`, `computed`)
+- RxJS is used for effects and async event streams
 - uncontrolled `subscribe` is forbidden
-- prefer `async` pipe and lifecycle-managed subscriptions
+- use `toSignal()` to bridge Observables to templates
+- use `takeUntilDestroyed()` for lifecycle-managed subscriptions in services
 
 Imports:
 - import the minimum required Material modules
@@ -275,20 +283,23 @@ Tests:
 - no unit tests for reducers/selectors while using NgRx
 - e2e tests coupled to real external systems
 
-## 13) Evolution plan (no refactor now)
+NgRx & API:
+- `async/await` functions inside NgRx Effect operators (use RxJS pipeable operators and `from()`)
+- mixing DTOs (Data Transfer Objects) with Domain Models (always map them explicitly)
 
-Iteration 1:
-- commit this document
-- add PR template
-- start placing new store code in domain-grouped structure
+## 13) Evolution plan
+
+Iteration 1 (Current):
+- migrate to Zoneless change detection
+- group NgRx store by domains
+- implement feature-based routing
+- establish CI/CD (Husky, ESLint, GitHub Actions)
 
 Iteration 2:
-- add `core/platform/*` as “empty adapters”
-- set up Playwright smoke suite
+- refactor timer engine to use Signals and decouple timer/tasks
+- add `core/platform/*` adapters
 
 Iteration 3:
 - integrate Telegram mini-app via adapters + auth strategy
 - prepare AWS Serverless contracts (API + event log)
 
-Iteration 4:
-- refactor timer engine; decouple timer/tasks via domain events

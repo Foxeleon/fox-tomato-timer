@@ -1,0 +1,57 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # Enable Corepack BEFORE setup-node so pnpm is available for caching
+      - name: Enable Corepack
+        run: corepack enable
+
+      # Setup Node.js with pnpm cache
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      # Diagnostics to confirm node and pnpm versions
+      - name: Diagnostics
+        run: |
+          node --version
+          pnpm --version
+
+      # Install dependencies with frozen lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Run linting checks
+      - name: Lint code
+        run: pnpm run lint
+
+      # Run tests with Jest for CI environment
+      - name: Run tests
+        run: pnpm run test:ci
+
+      # Build application in production mode
+      - name: Build application
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: pnpm run build --configuration production

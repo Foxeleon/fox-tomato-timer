@@ -1,49 +1,74 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .tasks-container {
   padding: 20px;
-  max-width: 600px; /* Сузим контейнер для улучшения читаемости */
-  margin: 0 auto;
-  background-color: #ffffff; /* Белый фон для контейнера */
-  border-radius: 12px; /* Увеличим скругления */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Тень для улучшения визуальной структуры */
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #ffffff; /* White background for the container */
+  border-radius: 16px; /* Increased border radius to match the timer */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Shadow matching the timer */
 }
 
-.task-input {
+.new-task-container {
   display: flex;
-  flex-direction: column; /* Ввод располагается вертикально */
-  margin-bottom: 20px;
+  gap: 16px;
+  width: 100%;
+  align-items: flex-start;
 }
 
-.task-input mat-form-field {
-  width: 100%; /* Поле ввода занимает всё пространство */
+.task-input-wrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.time-input-wrapper {
+  flex: 0 0 100px;
+  width: 100px;
+}
+
+.task-input-wrapper mat-form-field,
+.time-input-wrapper mat-form-field {
+  width: 100%;
+}
+
+.validation-errors-wrapper {
+  text-align: end;
 }
 
 mat-form-field {
-  background: #ffffff; /* Белый фон поля */
-  border-radius: 8px; /* Скруглённые углы */
-  padding: 5px 12px; /* Внутренние отступы */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Лёгкая тень */
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  background: #ffffff; /* White background for the field */
+  border-radius: 8px; /* Rounded corners */
+  padding: 0; /* Remove inner padding since Material manages it internally */
+  box-shadow: none; /* Remove conflicting shadow */
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 mat-form-field.mat-focused {
-  box-shadow: 0 0 8px rgba(74, 144, 226, 0.3); /* Голубая тень при фокусе */
-  border: 1px solid #4a90e2; /* Цветовая рамка при фокусе */
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.3); /* Light blue shadow on focus */
+  border: 1px solid #4a90e2; /* Colored border on focus */
 }
 
 input[matInput] {
-  font-size: 16px; /* Размер текста */
-  padding: 12px; /* Удобные отступы */
+  font-size: 16px; /* Text size */
+  padding: 12px; /* Comfortable padding */
   border: none;
   outline: none;
 }
 
 input[matInput]::placeholder {
   font-size: 14px;
-  color: #aaa; /* Лёгкий оттенок для текста placeholder */
+  color: #aaa; /* Light shade for the placeholder text */
 }
 
 input[matInput]:focus::placeholder {
-  color: transparent; /* Исчезает placeholder при фокусе */
+  color: transparent; /* Hide placeholder on focus */
 }
 
 .task-input input {
@@ -53,11 +78,13 @@ input[matInput]:focus::placeholder {
   border: 1px solid #ddd;
   border-radius: 6px;
   outline: none;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 
   &:focus {
-    border-color: #4a90e2; /* Цвет рамки при фокусе */
-    box-shadow: 0 0 5px #4a90e2; /* Мягкий акцент на фокусе */
+    border-color: #4a90e2; /* Border color on focus */
+    box-shadow: 0 0 5px #4a90e2; /* Soft accent on focus */
   }
 }
 
@@ -72,15 +99,16 @@ input[matInput]:focus::placeholder {
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #357abd; /* Более тёмный цвет на ховере */
+    background-color: #357abd; /* Darker color on hover */
   }
 }
 
 .tasks-list {
-  background: #f9f9f9; /* Светло-серый фон для разделения визуальных областей */
-  border-radius: 12px; /* Более приятные скругления */
+  margin-top: 16px;
+  background: #f9f9f9; /* Light gray background to separate visual areas */
+  border-radius: 12px; /* More pleasant border radius */
   padding: 16px;
-  min-height: 100px; /* Больше пространства для отображения пустых списков */
+  min-height: 100px; /* More space for displaying empty lists */
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -89,11 +117,13 @@ input[matInput]:focus::placeholder {
   border-radius: 8px;
   margin-bottom: 10px;
   padding: 14px 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Лёгкая тень для отделения задач */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Light shadow to separate tasks */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: grab;
 
   &:last-child {
@@ -101,17 +131,17 @@ input[matInput]:focus::placeholder {
   }
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Увеличение тени при наведении */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Increased shadow on hover */
   }
 
   &.cdk-drag-preview {
     transform: scale(1.05);
     z-index: 10;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3); /* Чёткий акцент на перетаскиваемом элементе */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3); /* Clear accent on the dragged element */
   }
 
   &.cdk-drag-placeholder {
-    border: 2px dashed #ccc; /* Декоративная рамка для placeholder */
+    border: 2px dashed #ccc; /* Decorative border for the placeholder */
     background: #f0f0f0;
     border-radius: 8px;
     min-height: 50px;
@@ -129,28 +159,28 @@ input[matInput]:focus::placeholder {
   margin: 0 12px;
   min-width: 60px;
   text-align: center;
-  font-family: 'Roboto Mono', monospace; /* Моноширинный шрифт для чисел */
+  font-family: 'Roboto Mono', monospace; /* Monospace font for numbers */
 
-  /* Добавляем небольшую анимацию при изменении значения */
+  /* Add a slight animation when the value changes */
   transition: background-color 0.2s ease;
 
-  /* Предотвращаем перенос строки */
+  /* Prevent line breaks */
   white-space: nowrap;
 
-  /* Эффект при наведении */
+  /* Hover effect */
   &:hover {
     background-color: #e3e6eb;
   }
 }
 
-/* Стиль для активного таймера */
+/* Style for the active timer */
 .task-duration.active {
   color: #4a90e2;
   background-color: rgba(74, 144, 226, 0.1);
   font-weight: 600;
 }
 
-/* Адаптивность для мобильных устройств */
+/* Responsiveness for mobile devices */
 @media (max-width: 600px) {
   .task-duration {
     font-size: 12px;
@@ -177,10 +207,11 @@ input[matInput]:focus::placeholder {
 }
 
 .task-title {
+  text-align: center;
   font-size: 16px;
   font-weight: 500;
   color: #444;
-  overflow: hidden; /* Обрезаем текст, если длинный */
+  overflow: hidden; /* Crop text if it is too long */
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -197,11 +228,13 @@ input[matInput]:focus::placeholder {
   color: #666;
   padding: 4px;
   border-radius: 4px;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 
   &:hover {
-    color: #4a90e2; /* Акцентный цвет при наведении */
-    background-color: rgba(74, 144, 226, 0.1); /* Полупрозрачный акцент */
+    color: #4a90e2; /* Accent color on hover */
+    background-color: rgba(74, 144, 226, 0.1); /* Semi-transparent accent */
   }
 
   mat-icon {
