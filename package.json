@@ -12,6 +12,7 @@
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"**/*.{ts,html,scss,json,md}\"",
+    "lint-staged": "lint-staged",
     "postinstall": "husky",
     "prepare": "husky"
   },

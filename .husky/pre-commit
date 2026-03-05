@@ -3,7 +3,7 @@
 
 echo "🚀 Running pre-commit checks (formatting & linting)..."
 
-if npx lint-staged; then
+if pnpm lint-staged; then
   echo "✅ Pre-commit checks passed!"
 else
   echo "❌ Linting failed. Please fix the errors above."
