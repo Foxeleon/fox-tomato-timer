@@ -1,5 +1,5 @@
 <div class="timer">
-  <h2 class="mat-display-4">{{ timerStore.remainingMs() | date: 'mm:ss' : 'UTC' }}</h2>
+  <h2 class="mat-display-4">{{ formatDurationMmSs(timerStore.remainingMs()) }}</h2>
   <div
     class="active-task-display"
     style="text-align: center; margin-top: 1rem; margin-bottom: 1rem"

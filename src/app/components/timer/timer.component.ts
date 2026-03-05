@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -8,14 +8,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  selectIsActiveTaskPaused,
-  selectIsTaskInputActive,
-  selectActiveTask,
-  saveTaskProgress,
-} from '../../store/tasks';
+import { selectIsTaskInputActive, selectActiveTask, saveTaskProgress } from '../../store/tasks';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerStore } from './domain/timer.store';
+import { formatDurationMmSs } from '../../shared/util/time.util';
 
 @Component({
   selector: 'app-timer',
@@ -48,17 +44,6 @@ export class TimerComponent {
   protected readonly isTaskInputActive = toSignal(this.store.select(selectIsTaskInputActive), {
     initialValue: false,
   });
-  private readonly isActiveTaskPaused = toSignal(this.store.select(selectIsActiveTaskPaused), {
-    initialValue: false,
-  });
-
-  protected readonly isPlayButtonEnabled = computed(
-    () =>
-      this.timerStore.status() === 'running' ||
-      this.isTaskInputActive() ||
-      this.isActiveTaskPaused() ||
-      this.activeTask() !== null,
-  );
 
   toggleTimer(): void {
     if (this.timerStore.status() === 'running') {
@@ -108,10 +93,6 @@ export class TimerComponent {
     }
   }
 
-  protected formatTime(ms: number): string {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }
+  // Expose shared util as protected method for template access
+  protected formatDurationMmSs = formatDurationMmSs;
 }

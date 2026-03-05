@@ -1,6 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  FormControl,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
@@ -13,6 +20,7 @@ import { selectNewTaskTitle, selectAllTasks, selectActiveTask } from '../../stor
 import { TaskService } from '../../shared/services/task.service';
 import { TimerStore } from '../timer/domain/timer.store';
 import { animate, transition, trigger } from '@angular/animations';
+import { formatDurationMmSs } from '../../shared/util/time.util';
 
 @Component({
   selector: 'app-tasks',
@@ -49,10 +57,24 @@ export class TasksComponent implements OnInit {
   readonly activeTask = this.store.selectSignal(selectActiveTask);
   readonly newTaskTitle = this.store.selectSignal(selectNewTaskTitle);
 
+  // Custom validator to prevent 00:00 duration
+  private zeroDuration(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+
+    const [minutes, seconds] = control.value.split(':').map(Number);
+    const totalMs = (minutes * 60 + seconds) * 1000;
+
+    return totalMs === 0 ? { zeroDuration: true } : null;
+  }
+
   protected readonly durationInputControl = new FormControl(
-    this.formatMsToMmSs(this.timerStore.baseDurationMs()),
+    formatDurationMmSs(this.timerStore.baseDurationMs()),
     {
-      validators: [Validators.required, Validators.pattern(/^([0-9][0-9]*):([0-5][0-9])$/)],
+      validators: [
+        Validators.required,
+        Validators.pattern(/^([0-9]{1,2}):([0-5][0-9])$/),
+        this.zeroDuration,
+      ],
       updateOn: 'blur',
     },
   );
@@ -70,8 +92,12 @@ export class TasksComponent implements OnInit {
     if (this.durationInputControl.valid && this.durationInputControl.value) {
       const [minutes, seconds] = this.durationInputControl.value.split(':').map(Number);
       const ms = (minutes * 60 + seconds) * 1000;
-      this.timerStore.setBaseDuration(ms);
-      this.durationInputControl.setValue(this.formatMsToMmSs(ms));
+
+      // Only set base duration if not zero (validator should prevent this, but double-check)
+      if (ms > 0) {
+        this.timerStore.setBaseDuration(ms);
+        this.durationInputControl.setValue(formatDurationMmSs(ms));
+      }
     }
   }
 
@@ -197,11 +223,6 @@ export class TasksComponent implements OnInit {
     return (minutes * 60 + seconds) * 1000;
   }
 
-  formatMsToMmSs(ms: number): string {
-    if (ms < 0) ms = 0;
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }
+  // Expose shared util as protected method for template access
+  protected formatDurationMmSs = formatDurationMmSs;
 }
