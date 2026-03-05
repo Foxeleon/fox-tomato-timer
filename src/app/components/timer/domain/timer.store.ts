@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
 import { Store } from '@ngrx/store';
-import { timerCompleted } from '../../../store/timer/timer.actions';
+import { timerCompleted } from '../../../store/timer';
 
 export type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
 export type TimerMode = 'pomodoro' | 'shortBreak' | 'longBreak';

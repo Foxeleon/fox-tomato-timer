@@ -5,7 +5,7 @@ import * as TimerActions from '../../store/timer/timer.actions';
 import * as TasksActions from '../../store/tasks/task.actions';
 import { Store } from '@ngrx/store';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { selectDuration, selectIsRunning } from '../../store/timer/timer.selectors';
+import { selectDuration, selectIsRunning } from '../../store/timer';
 import { TimerStore } from '../../components/timer/domain/timer.store';
 import { TaskService } from './task.service';
 
