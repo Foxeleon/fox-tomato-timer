@@ -1,8 +1,11 @@
 #!/bin/sh
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../.." || exit 1
 export PATH="./node_modules/.bin:$PATH"
 echo "🚧 Running pre-push checks (tests & build)..."
 
-pnpm run test:ci && pnpm run build --configuration production
-
-echo "✅ All pre-push checks passed! Uploading..."
+if pnpm run test:ci && pnpm run build --configuration production; then
+  echo "✅ All pre-push checks passed! Uploading..."
+else
+  echo "❌ Pre-push checks failed. Fix tests/build before pushing."
+  exit 1
+fi
