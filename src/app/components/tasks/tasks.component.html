@@ -45,8 +45,8 @@
         <div
           class="task-item"
           cdkDrag
-          [class.is-dragging-up]="draggedDirection === 'draggingUp'"
-          [class.is-dragging-down]="draggedDirection === 'draggingDown'"
+          [class.is-dragging-up]="isDraggingUp"
+          [class.is-dragging-down]="isDraggingDown"
         >
           <div class="task-content">
             <span class="task-title">{{ task.title }}</span>

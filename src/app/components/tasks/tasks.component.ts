@@ -38,7 +38,8 @@ import { formatDurationMmSs } from '../../shared/util/time.util';
   styleUrl: './tasks.component.scss',
 })
 export class TasksComponent implements OnInit {
-  draggedDirection: 'draggingUp' | 'draggingDown' | 'idle' = 'idle';
+  isDraggingUp = false;
+  isDraggingDown = false;
 
   private readonly store = inject(Store);
   private readonly taskService = inject(TaskService);
@@ -163,17 +164,13 @@ export class TasksComponent implements OnInit {
       updatedTasks.splice(event.currentIndex, 0, movedTask);
       this.store.dispatch(TasksActions.updateTaskOrder({ tasks: updatedTasks }));
     }
-    this.draggedDirection = 'idle';
+    this.isDraggingUp = false;
+    this.isDraggingDown = false;
   }
 
   onDragMoved(event: CdkDragSortEvent<Task[]>) {
-    if (event.previousIndex > event.currentIndex) {
-      this.draggedDirection = 'draggingUp';
-    } else if (event.previousIndex < event.currentIndex) {
-      this.draggedDirection = 'draggingDown';
-    } else {
-      this.draggedDirection = 'idle';
-    }
+    this.isDraggingUp = event.previousIndex > event.currentIndex;
+    this.isDraggingDown = event.previousIndex < event.currentIndex;
   }
 
   editTask(task: Task) {
