@@ -49,7 +49,13 @@ export class TimerComponent {
 
   startTimer(): void {
     const activeTask = this.activeTask();
+
     if (activeTask === null) {
+      // Strict architectural guard: Prevent implicit task creation if baseDurationMs is invalid (0)
+      if (this.timerStore.baseDurationMs() <= 0) {
+        return;
+      }
+
       if (this.isTaskInputActive()) {
         this.taskService.addTask(this.timerStore.baseDurationMs());
       }

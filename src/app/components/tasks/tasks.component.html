@@ -20,7 +20,7 @@
             placeholder="New task"
             [ngModel]="newTaskTitle()"
             (ngModelChange)="onTaskInputChange($event)"
-            (keyup.enter)="addTask()"
+            (keyup.enter)="durationInputControl.valid && addTask()"
           />
         </mat-form-field>
       </div>

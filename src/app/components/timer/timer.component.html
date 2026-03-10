@@ -17,7 +17,10 @@
       mat-fab
       color="primary"
       (click)="toggleTimer()"
-      [disabled]="!activeTask() && !isTaskInputActive()"
+      [disabled]="
+        (!activeTask() && !isTaskInputActive()) ||
+        (!activeTask() && timerStore.baseDurationMs() <= 0)
+      "
       [class.is-paused]="timerStore.status() === 'running'"
     >
       <mat-icon>{{ timerStore.status() === 'running' ? 'pause' : 'play_arrow' }}</mat-icon>

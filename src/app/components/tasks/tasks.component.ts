@@ -94,6 +94,21 @@ export class TasksComponent implements OnInit {
   }
 
   addTask() {
+    // 1. Strict validation guard: abort if the input duration is invalid (e.g., 00:00 or malformed)
+    if (this.durationInputControl.invalid) {
+      this.durationInputControl.markAsTouched();
+      return;
+    }
+
+    // 2. Mitigate race condition between Enter key and blur event
+    // Ensure the valid input duration is immediately parsed and synced to the timerStore
+    if (this.durationInputControl.value) {
+      const parsedMs = this.parseDurationString(this.durationInputControl.value);
+      if (parsedMs !== this.timerStore.baseDurationMs()) {
+        this.timerStore.setBaseDuration(parsedMs);
+      }
+    }
+
     const title = this.newTaskTitle().trim();
     if (!title) return;
 
