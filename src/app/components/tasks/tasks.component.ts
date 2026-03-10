@@ -19,7 +19,6 @@ import * as TasksActions from '../../store/tasks/task.actions';
 import { selectNewTaskTitle, selectAllTasks, selectActiveTask } from '../../store/tasks';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerStore } from '../timer/domain/timer.store';
-import { animate, transition, trigger } from '@angular/animations';
 import { formatDurationMmSs } from '../../shared/util/time.util';
 
 @Component({
@@ -37,14 +36,6 @@ import { formatDurationMmSs } from '../../shared/util/time.util';
   ],
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.scss',
-  animations: [
-    trigger('dragAnimation', [
-      transition('idle => draggingUp', animate('200ms ease-in-out')),
-      transition('idle => draggingDown', animate('200ms ease-in-out')),
-      transition('draggingUp => idle', animate('200ms ease-in')),
-      transition('draggingDown => idle', animate('200ms ease-in')),
-    ]),
-  ],
 })
 export class TasksComponent implements OnInit {
   draggedDirection: 'draggingUp' | 'draggingDown' | 'idle' = 'idle';

@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
-import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { selectIsTaskInputActive, selectActiveTask, saveTaskProgress } from '../../store/tasks';
 import { TaskService } from '../../shared/services/task.service';
@@ -26,13 +25,6 @@ import { formatDurationMmSs } from '../../shared/util/time.util';
   ],
   templateUrl: './timer.component.html',
   styleUrls: ['./timer.component.scss'],
-  animations: [
-    trigger('rotateAnimation', [
-      state('play', style({ transform: 'rotate(0deg)' })),
-      state('pause', style({ transform: 'rotate(180deg)' })),
-      transition('play <=> pause', animate('300ms ease-in-out')),
-    ]),
-  ],
 })
 export class TimerComponent {
   protected readonly timerStore = inject(TimerStore);

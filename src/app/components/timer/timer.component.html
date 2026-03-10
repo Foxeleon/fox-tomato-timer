@@ -18,7 +18,7 @@
       color="primary"
       (click)="toggleTimer()"
       [disabled]="!activeTask() && !isTaskInputActive()"
-      [@rotateAnimation]="timerStore.status() === 'running' ? 'pause' : 'play'"
+      [class.is-paused]="timerStore.status() === 'running'"
     >
       <mat-icon>{{ timerStore.status() === 'running' ? 'pause' : 'play_arrow' }}</mat-icon>
     </button>
