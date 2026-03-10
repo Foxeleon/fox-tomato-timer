@@ -1,5 +1,5 @@
 <div class="timer">
-  <h2 class="mat-display-4">{{ timerStore.remainingMs() | date: 'mm:ss' : 'UTC' }}</h2>
+  <h2 class="mat-display-4">{{ formatDurationMmSs(timerStore.remainingMs()) }}</h2>
   <div
     class="active-task-display"
     style="text-align: center; margin-top: 1rem; margin-bottom: 1rem"
@@ -17,8 +17,11 @@
       mat-fab
       color="primary"
       (click)="toggleTimer()"
-      [disabled]="!activeTask() && !isTaskInputActive()"
-      [@rotateAnimation]="timerStore.status() === 'running' ? 'pause' : 'play'"
+      [disabled]="
+        (!activeTask() && !isTaskInputActive()) ||
+        (!activeTask() && timerStore.baseDurationMs() <= 0)
+      "
+      [class.is-paused]="timerStore.status() === 'running'"
     >
       <mat-icon>{{ timerStore.status() === 'running' ? 'pause' : 'play_arrow' }}</mat-icon>
     </button>

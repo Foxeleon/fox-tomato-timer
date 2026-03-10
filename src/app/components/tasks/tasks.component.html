@@ -1,80 +1,88 @@
 <div class="tasks-container">
   <h2>Tasks</h2>
-  <div class="validation-errors-wrapper">
-    @if (durationInputControl.invalid && durationInputControl.errors?.['required']) {
-      <mat-error> Duration is required. </mat-error>
-    }
-    @if (durationInputControl.invalid && durationInputControl.errors?.['pattern']) {
-      <mat-error> Duration must be in the format mm:ss. (max 99:59) </mat-error>
-    }
-    <div>
-      <div class="new-task-container">
-        <div class="task-input-wrapper">
-          <mat-form-field subscriptSizing="dynamic">
-            <input
-              matInput
-              placeholder="New task"
-              [ngModel]="newTaskTitle()"
-              (ngModelChange)="onTaskInputChange($event)"
-              (keyup.enter)="addTask()"
-            />
-          </mat-form-field>
-        </div>
-        <div class="time-input-wrapper">
-          <mat-form-field subscriptSizing="dynamic">
-            <input
-              matInput
-              [formControl]="durationInputControl"
-              placeholder="Duration (mm:ss)"
-              (blur)="onDurationBlur()"
-            />
-          </mat-form-field>
-        </div>
+  <div>
+    <div class="validation-errors-wrapper">
+      @if (durationInputControl.invalid && durationInputControl.errors?.['required']) {
+        <mat-error> Duration is required. </mat-error>
+      }
+      @if (durationInputControl.invalid && durationInputControl.errors?.['pattern']) {
+        <mat-error> Duration must be in the format mm:ss. (max 99:59) </mat-error>
+      }
+      @if (durationInputControl.invalid && durationInputControl.errors?.['zeroDuration']) {
+        <mat-error> Duration cannot be 00:00. </mat-error>
+      }
+    </div>
+    <div class="new-task-container">
+      <div class="task-input-wrapper">
+        <mat-form-field subscriptSizing="dynamic">
+          <input
+            matInput
+            placeholder="New task"
+            [ngModel]="newTaskTitle()"
+            (ngModelChange)="onTaskInputChange($event)"
+            (keyup.enter)="durationInputControl.valid && addTask()"
+          />
+        </mat-form-field>
       </div>
-      <div
-        cdkDropList
-        class="tasks-list"
-        (cdkDropListDropped)="drop($event)"
-        (cdkDropListSorted)="onDragMoved($event)"
-      >
-        @for (task of tasks(); track task.id) {
-          <div class="task-item" cdkDrag [@dragAnimation]="draggedDirection">
-            <div class="task-content">
-              <span class="task-title">{{ task.title }}</span>
-              <span class="task-duration">
-                {{
-                  activeTask()?.id === task.id
-                    ? 'Remaining time: ' + formatMsToMmSs(timerStore.remainingMs())
-                    : 'Remaining time: ' + formatMsToMmSs(task.duration - task.elapsedTime)
-                }}
-              </span>
-              <div class="task-actions">
-                <button
-                  mat-icon-button
-                  (click)="playTask(task)"
-                  [disabled]="task.state === 'completed'"
-                >
-                  <mat-icon>
-                    {{
-                      task.state === 'completed'
-                        ? 'check'
-                        : activeTask()?.id === task.id && timerStore.status() === 'running'
-                          ? 'pause'
-                          : 'play_arrow'
-                    }}
-                  </mat-icon>
-                </button>
-                <button mat-icon-button (click)="editTask(task)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button (click)="deleteTask(task.id)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
+      <div class="time-input-wrapper">
+        <mat-form-field subscriptSizing="dynamic">
+          <input
+            matInput
+            [formControl]="durationInputControl"
+            placeholder="Duration (mm:ss)"
+            (blur)="onDurationBlur()"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+    <div
+      cdkDropList
+      class="tasks-list"
+      (cdkDropListDropped)="drop($event)"
+      (cdkDropListSorted)="onDragMoved($event)"
+    >
+      @for (task of tasks(); track task.id) {
+        <div
+          class="task-item"
+          cdkDrag
+          [class.is-dragging-up]="isDraggingUp"
+          [class.is-dragging-down]="isDraggingDown"
+        >
+          <div class="task-content">
+            <span class="task-title">{{ task.title }}</span>
+            <span class="task-duration">
+              {{
+                activeTask()?.id === task.id
+                  ? 'Remaining time: ' + formatDurationMmSs(timerStore.remainingMs())
+                  : 'Remaining time: ' + formatDurationMmSs(task.duration - task.elapsedTime)
+              }}
+            </span>
+            <div class="task-actions">
+              <button
+                mat-icon-button
+                (click)="playTask(task)"
+                [disabled]="task.state === 'completed'"
+              >
+                <mat-icon>
+                  {{
+                    task.state === 'completed'
+                      ? 'check'
+                      : activeTask()?.id === task.id && timerStore.status() === 'running'
+                        ? 'pause'
+                        : 'play_arrow'
+                  }}
+                </mat-icon>
+              </button>
+              <button mat-icon-button (click)="editTask(task)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteTask(task.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
           </div>
-        }
-      </div>
+        </div>
+      }
     </div>
   </div>
 </div>

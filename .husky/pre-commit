@@ -1,7 +1,9 @@
+#!/bin/sh
+pnpm lint-staged
+
 echo "🚀 Running pre-commit checks (formatting & linting)..."
 
-# Run lint-staged with pnpm to check and format staged files before commit
-if pnpm exec lint-staged; then
+if pnpm lint-staged; then
   echo "✅ Pre-commit checks passed!"
 else
   echo "❌ Linting failed. Please fix the errors above."

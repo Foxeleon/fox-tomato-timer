@@ -14,10 +14,6 @@ export const deleteTaskSuccess = createAction(
   '[Task] Delete Task Success',
   props<{ id: string }>(),
 );
-export const deleteTaskFailure = createAction(
-  '[Task] Delete Task Failure',
-  props<{ id: string; error: unknown }>(),
-);
 export const stopTask = createAction('[Task] Stop Task', props<{ activeTask: ActiveTask }>());
 export const saveTaskProgress = createAction(
   '[Task] Save Progress',

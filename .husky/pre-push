@@ -1,15 +1,11 @@
+#!/bin/sh
+pnpm run test:ci && pnpm run build --configuration production
+
 echo "🚧 Running pre-push checks (tests & build)..."
 
-# Run tests
-if ! pnpm run test:ci; then
-  echo "❌ Tests failed. Please fix the errors before pushing."
+if pnpm run test:ci && pnpm run build --configuration production; then
+  echo "✅ All pre-push checks passed! Uploading..."
+else
+  echo "❌ Pre-push checks failed. Fix tests/build before pushing."
   exit 1
 fi
-
-# Run build
-if ! pnpm run build --configuration production; then
-  echo "❌ Build failed. Please fix the errors before pushing."
-  exit 1
-fi
-
-echo "✅ All pre-push checks passed! Uploading..."

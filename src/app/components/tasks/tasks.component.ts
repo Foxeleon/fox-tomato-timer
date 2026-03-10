@@ -1,6 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  FormControl,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
@@ -12,7 +19,7 @@ import * as TasksActions from '../../store/tasks/task.actions';
 import { selectNewTaskTitle, selectAllTasks, selectActiveTask } from '../../store/tasks';
 import { TaskService } from '../../shared/services/task.service';
 import { TimerStore } from '../timer/domain/timer.store';
-import { animate, transition, trigger } from '@angular/animations';
+import { formatDurationMmSs } from '../../shared/util/time.util';
 
 @Component({
   selector: 'app-tasks',
@@ -29,17 +36,10 @@ import { animate, transition, trigger } from '@angular/animations';
   ],
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.scss',
-  animations: [
-    trigger('dragAnimation', [
-      transition('idle => draggingUp', animate('200ms ease-in-out')),
-      transition('idle => draggingDown', animate('200ms ease-in-out')),
-      transition('draggingUp => idle', animate('200ms ease-in')),
-      transition('draggingDown => idle', animate('200ms ease-in')),
-    ]),
-  ],
 })
 export class TasksComponent implements OnInit {
-  draggedDirection: 'draggingUp' | 'draggingDown' | 'idle' = 'idle';
+  isDraggingUp = false;
+  isDraggingDown = false;
 
   private readonly store = inject(Store);
   private readonly taskService = inject(TaskService);
@@ -49,10 +49,24 @@ export class TasksComponent implements OnInit {
   readonly activeTask = this.store.selectSignal(selectActiveTask);
   readonly newTaskTitle = this.store.selectSignal(selectNewTaskTitle);
 
+  // Custom validator to prevent 00:00 duration
+  private zeroDuration(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+
+    const [minutes, seconds] = control.value.split(':').map(Number);
+    const totalMs = (minutes * 60 + seconds) * 1000;
+
+    return totalMs === 0 ? { zeroDuration: true } : null;
+  }
+
   protected readonly durationInputControl = new FormControl(
-    this.formatMsToMmSs(this.timerStore.baseDurationMs()),
+    formatDurationMmSs(this.timerStore.baseDurationMs()),
     {
-      validators: [Validators.required, Validators.pattern(/^([0-9][0-9]*):([0-5][0-9])$/)],
+      validators: [
+        Validators.required,
+        Validators.pattern(/^([0-9]{1,2}):([0-5][0-9])$/),
+        this.zeroDuration,
+      ],
       updateOn: 'blur',
     },
   );
@@ -70,12 +84,31 @@ export class TasksComponent implements OnInit {
     if (this.durationInputControl.valid && this.durationInputControl.value) {
       const [minutes, seconds] = this.durationInputControl.value.split(':').map(Number);
       const ms = (minutes * 60 + seconds) * 1000;
-      this.timerStore.setBaseDuration(ms);
-      this.durationInputControl.setValue(this.formatMsToMmSs(ms));
+
+      // Only set base duration if not zero (validator should prevent this, but double-check)
+      if (ms > 0) {
+        this.timerStore.setBaseDuration(ms);
+        this.durationInputControl.setValue(formatDurationMmSs(ms));
+      }
     }
   }
 
   addTask() {
+    // 1. Strict validation guard: abort if the input duration is invalid (e.g., 00:00 or malformed)
+    if (this.durationInputControl.invalid) {
+      this.durationInputControl.markAsTouched();
+      return;
+    }
+
+    // 2. Mitigate race condition between Enter key and blur event
+    // Ensure the valid input duration is immediately parsed and synced to the timerStore
+    if (this.durationInputControl.value) {
+      const parsedMs = this.parseDurationString(this.durationInputControl.value);
+      if (parsedMs !== this.timerStore.baseDurationMs()) {
+        this.timerStore.setBaseDuration(parsedMs);
+      }
+    }
+
     const title = this.newTaskTitle().trim();
     if (!title) return;
 
@@ -146,21 +179,17 @@ export class TasksComponent implements OnInit {
       updatedTasks.splice(event.currentIndex, 0, movedTask);
       this.store.dispatch(TasksActions.updateTaskOrder({ tasks: updatedTasks }));
     }
-    this.draggedDirection = 'idle';
+    this.isDraggingUp = false;
+    this.isDraggingDown = false;
   }
 
   onDragMoved(event: CdkDragSortEvent<Task[]>) {
-    if (event.previousIndex > event.currentIndex) {
-      this.draggedDirection = 'draggingUp';
-    } else if (event.previousIndex < event.currentIndex) {
-      this.draggedDirection = 'draggingDown';
-    } else {
-      this.draggedDirection = 'idle';
-    }
+    this.isDraggingUp = event.previousIndex > event.currentIndex;
+    this.isDraggingDown = event.previousIndex < event.currentIndex;
   }
 
   editTask(task: Task) {
-    const updatedTitle = prompt('Введите новое название задачи:', task.title);
+    const updatedTitle = prompt('Enter new task name:', task.title);
     if (updatedTitle !== null && updatedTitle.trim() !== '') {
       this.taskService.patchTask(task.id, { title: updatedTitle.trim() });
     }
@@ -190,18 +219,13 @@ export class TasksComponent implements OnInit {
   }
 
   private parseDurationString(durationStr: string): number {
-    if (!durationStr || typeof durationStr !== 'string') {
+    if (!durationStr) {
       return this.timerStore.baseDurationMs();
     }
     const [minutes, seconds] = durationStr.split(':').map(Number);
     return (minutes * 60 + seconds) * 1000;
   }
 
-  formatMsToMmSs(ms: number): string {
-    if (ms < 0) ms = 0;
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }
+  // Expose shared util as protected method for template access
+  protected formatDurationMmSs = formatDurationMmSs;
 }

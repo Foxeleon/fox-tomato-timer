@@ -9,16 +9,16 @@
   align-items: center;
   gap: 1.5rem;
   padding: 2rem;
-  background-color: #ffffff; /* Белый фон */
+  background-color: #ffffff; /* White background */
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Легкая тень вместо черного квадрата */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Light shadow instead of black square */
 }
 
 h2.mat-display-4 {
   font-size: 6rem;
   font-weight: 300;
   line-height: 1;
-  color: #333333; /* Темно-серый текст на белом фоне */
+  color: #333333; /* Dark gray text on white background */
   margin: 0;
   padding: 0;
 }
@@ -31,7 +31,13 @@ h2.mat-display-4 {
 }
 
 button[mat-fab] {
-  transition: transform 0.3s ease-in-out;
+  transition:
+    transform 0.3s ease-in-out,
+    rotate 0.3s ease-in-out;
+
+  &.is-paused {
+    rotate: 180deg;
+  }
 
   &:active {
     transform: scale(0.95);

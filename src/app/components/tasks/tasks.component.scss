@@ -126,6 +126,16 @@ input[matInput]:focus::placeholder {
     box-shadow 0.2s ease;
   cursor: grab;
 
+  &.is-dragging-up {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &.is-dragging-down {
+    transform: translateY(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
   &:last-child {
     margin-bottom: 0;
   }

@@ -25,6 +25,6 @@ export class StatisticsService {
   getTotalCompletedTasks(): Observable<number> {
     return this.taskService
       .getTasks()
-      .pipe(map((tasks) => tasks.filter((task) => task.completed).length));
+      .pipe(map((tasks) => tasks.filter((task) => task.state === 'completed').length));
   }
 }
