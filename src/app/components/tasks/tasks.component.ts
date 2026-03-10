@@ -174,7 +174,7 @@ export class TasksComponent implements OnInit {
   }
 
   editTask(task: Task) {
-    const updatedTitle = prompt('Введите новое название задачи:', task.title);
+    const updatedTitle = prompt('Enter new task name:', task.title);
     if (updatedTitle !== null && updatedTitle.trim() !== '') {
       this.taskService.patchTask(task.id, { title: updatedTitle.trim() });
     }
@@ -204,7 +204,7 @@ export class TasksComponent implements OnInit {
   }
 
   private parseDurationString(durationStr: string): number {
-    if (!durationStr || typeof durationStr !== 'string') {
+    if (!durationStr) {
       return this.timerStore.baseDurationMs();
     }
     const [minutes, seconds] = durationStr.split(':').map(Number);

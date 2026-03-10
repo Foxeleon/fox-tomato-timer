@@ -1,33 +1,34 @@
 @use '@angular/material' as mat;
 
-// Включаем базовые стили Material
+// Include base Material styles
 @include mat.elevation-classes();
 @include mat.app-background();
 
-// Определяем тему в стиле Material 3
+// Define theme in Material 3 style
 $theme: mat.define-theme(
-    (
-      color: (
-        theme-type: light,
-        primary: mat.$blue-palette,
-        tertiary: mat.$magenta-palette,
-      ),
-    )
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$blue-palette,
+      tertiary: mat.$magenta-palette,
+    ),
+  )
 );
 
-// Оборачиваем применение темы в селектор
+// Wrap theme application in a selector
 .mat-app-background {
   @include mat.all-component-themes($theme);
 }
 
-// Глобальные стили
-html, body {
+// Global styles
+html,
+body {
   height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  // Добавляем класс для применения темы
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  // Add class for theme application
   @extend .mat-app-background;
 }
